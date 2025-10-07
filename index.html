@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Lab Ayunan Sederhana - TPB ITB</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Virtual Lab: Ayunan Sederhana</h1>
+        <p>Tugas Mata Kuliah TPB - Eksperimen Penentuan Percepatan Gravitasi (g)</p>
+    </header>
+
+    <main class="lab-container">
+        <section class="simulation-area">
+            <canvas id="pendulumCanvas" width="800" height="600">
+                Browser Anda tidak mendukung Canvas HTML5.
+            </canvas>
+            <div id="info-overlay">
+                <p>Panjang Tali (L): <span id="displayL">1.0</span> m</p>
+                <p>Periode (T): <span id="displayT">0.00</span> s</p>
+                <p>Gravitasi (g) saat ini: 9.81 m/s²</p>
+            </div>
+        </section>
+
+        <aside class="control-panel">
+            <h2>Kontrol Eksperimen</h2>
+
+            <div class="control-group">
+                <label for="lengthSlider">Panjang Tali (L):</label>
+                <input type="range" id="lengthSlider" min="0.5" max="2.5" step="0.05" value="1.0">
+                <span id="currentLength">1.00 m</span>
+            </div>
+
+            <div class="control-group">
+                <label for="angleSlider">Sudut Awal (θ₀):</label>
+                <input type="range" id="angleSlider" min="5" max="30" step="1" value="10">
+                <span id="currentAngle">10°</span>
+            </div>
+            
+            <div class="control-group">
+                <label for="massSlider">Massa Beban (m):</label>
+                <input type="range" id="massSlider" min="0.1" max="1.0" step="0.1" value="0.5">
+                <span id="currentMass">0.5 kg</span>
+                <p class="note">Catatan: Massa tidak memengaruhi periode dalam model ideal ini.</p>
+            </div>
+
+            <button id="startStopButton" class="action-button primary">Mulai Eksperimen (10 osilasi)</button>
+            <button id="resetButton" class="action-button secondary">Reset Simulasi</button>
+            <button id="clearDataButton" class="action-button danger">Hapus Data</button>
+
+            <h2 style="margin-top: 20px;">Data Hasil Eksperimen</h2>
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>L (m)</th>
+                            <th>T₁₀ (s)</th>
+                            <th>T (s)</th>
+                            <th>g (m/s²)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsTableBody">
+                        </tbody>
+                </table>
+            </div>
+            <div id="averageG">
+                <p>Rata-rata g: <span id="avgGValue">--</span> m/s²</p>
+            </div>
+        </aside>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
