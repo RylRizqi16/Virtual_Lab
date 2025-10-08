@@ -3,74 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Virtual Lab Ayunan Sederhana - TPB ITB</title>
+    <title>Virtual Lab Fisika Interaktif</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <h1>Virtual Lab: Ayunan Sederhana</h1>
-        <p>Tugas Mata Kuliah TPB - Eksperimen Penentuan Percepatan Gravitasi (g)</p>
-    </header>
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+        <div class="brand" data-view="landing" title="Kembali ke Beranda">
+            <span class="logo-dot"></span>
+            <span>Virtual Lab</span>
+        </div>
+        <ul class="nav-links">
+            <li><button class="link" data-view="pendulum">Bandul</button></li>
+            <li><button class="link" data-view="freefall">Jatuh Bebas</button></li>
+            <li><button class="link" data-view="projectile">Meriam</button></li>
+        </ul>
+    </nav>
 
-    <main class="lab-container">
-        <section class="simulation-area">
-            <canvas id="pendulumCanvas" width="800" height="600">
-                Browser Anda tidak mendukung Canvas HTML5.
-            </canvas>
-            <div id="info-overlay">
-                <p>Panjang Tali (L): <span id="displayL">1.0</span> m</p>
-                <p>Periode (T): <span id="displayT">0.00</span> s</p>
-                <p>Gravitasi (g) saat ini: 9.81 m/s²</p>
+    <main class="view-container">
+        <!-- Landing Page -->
+        <section id="view-landing" class="view active">
+            <header class="hero">
+                <h1>Virtual Lab Fisika</h1>
+                <p>Belajar interaktif dengan simulasi futuristis dan minimalis. Palet putih & biru untuk fokus dan estetika.</p>
+                <div class="hero-actions">
+                </div>
+            </header>
+
+            <section class="cards">
+                <div class="card" data-view="pendulum">
+                    <h3>Bandul (Ayunan)</h3>
+                    <p>Ukur periode untuk menentukan percepatan gravitasi.</p>
+                    <span class="pill">Eksperimen</span>
+                </div>
+                <div class="card" data-view="freefall">
+                    <h3>Jatuh Bebas</h3>
+                    <p>Amati lintasan, kecepatan, dan waktu jatuh tanpa hambatan udara.</p>
+                    <span class="pill">Simulasi</span>
+                </div>
+                <div class="card" data-view="projectile">
+                    <h3>Meriam (Gerak Parabola)</h3>
+                    <p>Visualisasi jarak jangkau, waktu terbang, dan tinggi maksimum.</p>
+                    <span class="pill">Simulasi</span>
+                </div>
+            </section>
+        </section>
+
+        <!-- Pendulum View -->
+        <section id="view-pendulum" class="view">
+            <header class="section-header">
+                <h2>Virtual Lab: Bandul (Ayunan Sederhana)</h2>
+                <p>TPB ITB - Eksperimen Penentuan Percepatan Gravitasi (g)</p>
+            </header>
+
+            <div class="lab-container">
+                <section class="simulation-area">
+                    <canvas id="pendulumCanvas" width="800" height="600">
+                        Browser Anda tidak mendukung Canvas HTML5.
+                    </canvas>
+                    <div id="info-overlay">
+                        <p>Panjang Tali (L): <span id="displayL">1.0</span> m</p>
+                        <p>Periode (T): <span id="displayT">0.00</span> s</p>
+                        <p>Gravitasi (g) saat ini: 9.81 m/s²</p>
+                    </div>
+                </section>
+
+                <aside class="control-panel">
+                    <h2>Kontrol Eksperimen</h2>
+
+                    <div class="control-group">
+                        <label for="lengthSlider">Panjang Tali (L):</label>
+                        <input type="range" id="lengthSlider" min="0.5" max="2.5" step="0.05" value="1.0">
+                        <span id="currentLength">1.00 m</span>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="angleSlider">Sudut Awal (θ₀):</label>
+                        <input type="range" id="angleSlider" min="5" max="30" step="1" value="10">
+                        <span id="currentAngle">10°</span>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="massSlider">Massa Beban (m):</label>
+                        <input type="range" id="massSlider" min="0.1" max="1.0" step="0.1" value="0.5">
+                        <span id="currentMass">0.5 kg</span>
+                        <p class="note">Catatan: Massa tidak memengaruhi periode dalam model ideal ini.</p>
+                    </div>
+
+                    <button id="startStopButton" class="action-button primary">Mulai Eksperimen (10 osilasi)</button>
+                    <button id="resetButton" class="action-button secondary">Reset Simulasi</button>
+                    <button id="clearDataButton" class="action-button danger">Hapus Data</button>
+
+                    <h2 style="margin-top: 20px;">Data Hasil Eksperimen</h2>
+                    <div class="table-scroll">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>No.</th>
+                                    <th>L (m)</th>
+                                    <th>T₁₀ (s)</th>
+                                    <th>T (s)</th>
+                                    <th>g (m/s²)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resultsTableBody">
+                                </tbody>
+                        </table>
+                    </div>
+                    <div id="averageG">
+                        <p>Rata-rata g: <span id="avgGValue">--</span> m/s²</p>
+                    </div>
+                </aside>
             </div>
         </section>
 
-        <aside class="control-panel">
-            <h2>Kontrol Eksperimen</h2>
+        <!-- Free Fall View -->
+        <section id="view-freefall" class="view">
+            <header class="section-header">
+                <h2>Simulasi Jatuh Bebas</h2>
+                <p>Observasi gerak lurus berubah beraturan tanpa hambatan udara.</p>
+            </header>
+            <div class="lab-container">
+                <section class="simulation-area">
+                    <canvas id="freefallCanvas" width="800" height="600"></canvas>
+                    <div class="info-overlay">
+                        <p>Posisi (y): <span id="ffPos">--</span> m</p>
+                        <p>Kecepatan (v): <span id="ffVel">--</span> m/s</p>
+                        <p>Waktu (t): <span id="ffTime">--</span> s</p>
+                    </div>
+                </section>
+                <aside class="control-panel">
+                    <h2>Kontrol</h2>
+                    <div class="control-group">
+                        <label for="ffHeight">Ketinggian Awal (h):</label>
+                        <input type="range" id="ffHeight" min="1" max="100" step="1" value="20">
+                        <span id="ffHeightVal">20 m</span>
+                    </div>
+                    <div class="control-group">
+                        <label for="ffMass">Massa (m):</label>
+                        <input type="range" id="ffMass" min="0.1" max="10" step="0.1" value="1">
+                        <span id="ffMassVal">1.0 kg</span>
+                        <p class="note">Dalam model ideal, massa tidak memengaruhi waktu jatuh.</p>
+                    </div>
+                    <div class="control-group">
+                        <label for="ffGravity">Gravitasi (g):</label>
+                        <input type="range" id="ffGravity" min="1" max="20" step="0.1" value="9.81">
+                        <span id="ffGravityVal">9.81 m/s²</span>
+                    </div>
+                    <button id="ffStart" class="action-button primary">Mulai</button>
+                    <button id="ffReset" class="action-button secondary">Reset</button>
+                </aside>
+            </div>
+        </section>
 
-            <div class="control-group">
-                <label for="lengthSlider">Panjang Tali (L):</label>
-                <input type="range" id="lengthSlider" min="0.5" max="2.5" step="0.05" value="1.0">
-                <span id="currentLength">1.00 m</span>
+        <!-- Projectile View -->
+        <section id="view-projectile" class="view">
+            <header class="section-header">
+                <h2>Simulasi Meriam (Gerak Parabola)</h2>
+                <p>Visualisasi lintasan proyektil, jangkauan, dan tinggi maksimum.</p>
+            </header>
+            <div class="lab-container">
+                <section class="simulation-area">
+                    <canvas id="projectileCanvas" width="800" height="600"></canvas>
+                    <div class="info-overlay">
+                        <p>Waktu Terbang: <span id="projTime">--</span> s</p>
+                        <p>Jangkauan: <span id="projRange">--</span> m</p>
+                        <p>Tinggi Maks: <span id="projHmax">--</span> m</p>
+                    </div>
+                </section>
+                <aside class="control-panel">
+                    <h2>Kontrol</h2>
+                    <div class="control-group">
+                        <label for="projSpeed">Kecepatan Awal (v₀):</label>
+                        <input type="range" id="projSpeed" min="5" max="100" step="1" value="40">
+                        <span id="projSpeedVal">40 m/s</span>
+                    </div>
+                    <div class="control-group">
+                        <label for="projAngle">Sudut Tembakan (θ):</label>
+                        <input type="range" id="projAngle" min="10" max="80" step="1" value="45">
+                        <span id="projAngleVal">45°</span>
+                    </div>
+                    <div class="control-group">
+                        <label for="projGravity">Gravitasi (g):</label>
+                        <input type="range" id="projGravity" min="1" max="20" step="0.1" value="9.81">
+                        <span id="projGravityVal">9.81 m/s²</span>
+                    </div>
+                    <button id="projStart" class="action-button primary">Tembak</button>
+                    <button id="projReset" class="action-button secondary">Reset</button>
+                </aside>
             </div>
-
-            <div class="control-group">
-                <label for="angleSlider">Sudut Awal (θ₀):</label>
-                <input type="range" id="angleSlider" min="5" max="30" step="1" value="10">
-                <span id="currentAngle">10°</span>
-            </div>
-            
-            <div class="control-group">
-                <label for="massSlider">Massa Beban (m):</label>
-                <input type="range" id="massSlider" min="0.1" max="1.0" step="0.1" value="0.5">
-                <span id="currentMass">0.5 kg</span>
-                <p class="note">Catatan: Massa tidak memengaruhi periode dalam model ideal ini.</p>
-            </div>
-
-            <button id="startStopButton" class="action-button primary">Mulai Eksperimen (10 osilasi)</button>
-            <button id="resetButton" class="action-button secondary">Reset Simulasi</button>
-            <button id="clearDataButton" class="action-button danger">Hapus Data</button>
-
-            <h2 style="margin-top: 20px;">Data Hasil Eksperimen</h2>
-            <div class="table-scroll">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>No.</th>
-                            <th>L (m)</th>
-                            <th>T₁₀ (s)</th>
-                            <th>T (s)</th>
-                            <th>g (m/s²)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="resultsTableBody">
-                        </tbody>
-                </table>
-            </div>
-            <div id="averageG">
-                <p>Rata-rata g: <span id="avgGValue">--</span> m/s²</p>
-            </div>
-        </aside>
+        </section>
     </main>
+
+    <footer class="site-footer">
+        <p>© 2025 Virtual Lab • Desain minimalis-futuristis putih & biru</p>
+    </footer>
 
     <script src="script.js"></script>
 </body>
