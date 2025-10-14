@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulasi Jatuh Bebas</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="top-nav">
+        <a class="brand" href="index.html" title="Beranda Virtual Lab">
+            <span class="logo-dot"></span>
+            <span>Virtual Lab</span>
+        </a>
+        <ul class="nav-links">
+            <li><a class="link" href="pendulum.html">Bandul</a></li>
+            <li><a class="link" href="freefall.html">Jatuh Bebas</a></li>
+            <li><a class="link" href="projectile.html">Meriam</a></li>
+            <li><button id="authButton" class="link outline" type="button">Masuk</button></li>
+        </ul>
+    </nav>
+
+    <main class="view-container">
+        <header class="section-header">
+            <h2>Simulasi Jatuh Bebas</h2>
+            <p>Observasi gerak lurus berubah beraturan tanpa hambatan udara.</p>
+        </header>
+        <div class="lab-container">
+            <section class="simulation-area">
+                <canvas id="freefallCanvas" width="800" height="600"></canvas>
+                <div class="info-overlay">
+                    <p>Posisi (y): <span id="ffPos">--</span> m</p>
+                    <p>Kecepatan (v): <span id="ffVel">--</span> m/s</p>
+                    <p>Waktu (t): <span id="ffTime">--</span> s</p>
+                </div>
+            </section>
+            <aside class="control-panel">
+                <h2>Kontrol</h2>
+                <div class="control-group">
+                    <label for="ffHeight">Ketinggian Awal (h):</label>
+                    <input type="range" id="ffHeight" min="1" max="100" step="1" value="20">
+                    <span id="ffHeightVal">20 m</span>
+                </div>
+                <div class="control-group">
+                    <label for="ffMass">Massa (m):</label>
+                    <input type="range" id="ffMass" min="0.1" max="10" step="0.1" value="1">
+                    <span id="ffMassVal">1.0 kg</span>
+                    <p class="note">Dalam model ideal, massa tidak memengaruhi waktu jatuh.</p>
+                </div>
+                <div class="control-group">
+                    <label for="ffGravity">Gravitasi (g):</label>
+                    <input type="range" id="ffGravity" min="1" max="20" step="0.1" value="9.81">
+                    <span id="ffGravityVal">9.81 m/s²</span>
+                </div>
+                <button id="ffStart" class="action-button primary" type="button">Mulai</button>
+                <button id="ffReset" class="action-button secondary" type="button">Reset</button>
+            </aside>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <p>© 2025 Virtual Lab • Desain minimalis-futuristis putih & biru</p>
+    </footer>
+
+    <div id="authModal" class="modal hidden" role="dialog" aria-modal="true">
+        <div class="modal-content">
+            <button class="modal-close" id="closeAuthModal" aria-label="Tutup">×</button>
+            <div class="modal-header">
+                <h2 id="authModalTitle">Masuk ke Virtual Lab</h2>
+                <p id="authModalSubtitle">Gunakan akun Anda untuk menyimpan progres eksperimen.</p>
+            </div>
+            <div class="modal-body">
+                <form id="loginForm" class="auth-form" autocomplete="on">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" name="email" required placeholder="anda@example.com">
+                    <label for="loginPassword">Kata Sandi</label>
+                    <input type="password" id="loginPassword" name="password" required minlength="6" placeholder="Minimal 6 karakter">
+                    <button type="submit" class="action-button primary">Masuk</button>
+                </form>
+                <form id="registerForm" class="auth-form hidden" autocomplete="on">
+                    <label for="registerEmail">Email</label>
+                    <input type="email" id="registerEmail" name="email" required placeholder="anda@example.com">
+                    <label for="registerPassword">Kata Sandi</label>
+                    <input type="password" id="registerPassword" name="password" required minlength="6" placeholder="Minimal 6 karakter">
+                    <label for="registerPasswordConfirm">Konfirmasi Kata Sandi</label>
+                    <input type="password" id="registerPasswordConfirm" name="passwordConfirm" required minlength="6" placeholder="Ulangi kata sandi">
+                    <button type="submit" class="action-button primary">Daftar</button>
+                </form>
+            </div>
+            <footer class="modal-footer">
+                <p id="authToggleText">Belum punya akun? <button id="authToggleButton" class="ghost-button" type="button">Daftar</button></p>
+            </footer>
+            <div id="authFeedback" role="status" class="auth-feedback" aria-live="polite"></div>
+        </div>
+    </div>
+
+    <script src="script.js" defer></script>
+</body>
+</html>

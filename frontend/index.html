@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Lab Fisika Interaktif</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="top-nav">
+        <a class="brand" href="index.html" title="Beranda Virtual Lab">
+            <span class="logo-dot"></span>
+            <span>Virtual Lab</span>
+        </a>
+        <ul class="nav-links">
+            <li><a class="link" href="pendulum.html">Bandul</a></li>
+            <li><a class="link" href="freefall.html">Jatuh Bebas</a></li>
+            <li><a class="link" href="projectile.html">Meriam</a></li>
+            <li><button id="authButton" class="link outline" type="button">Masuk</button></li>
+        </ul>
+    </nav>
+
+    <main class="view-container">
+        <header class="hero">
+            <h1>Selamat Datang di Virtual Lab Fisika</h1>
+            <p>Platform pembelajaran interaktif untuk mengeksplorasi konsep fisika melalui simulasi digital dengan tampilan minimalis-futuristis.</p>
+        </header>
+
+        <section class="auth-status-card" id="authStatusCard">
+            <div>
+                <h3>Masuk ke Virtual Lab</h3>
+                <p id="authStatusMessage">Masuk atau daftar untuk mulai menyimpan progres eksperimen Anda.</p>
+            </div>
+            <div class="auth-actions">
+                <button id="authCtaButton" class="action-button primary" type="button">Masuk / Daftar</button>
+                <button id="logoutButton" class="action-button secondary hidden" type="button">Keluar</button>
+            </div>
+        </section>
+
+        <section class="user-progress" id="landingAboutSection">
+            <header>
+                <h3>Tentang Aplikasi</h3>
+            </header>
+            <p>Virtual Lab Fisika membantu mahasiswa memahami eksperimen fisika dasar secara mandiri. Setiap simulasi dilengkapi dengan autentikasi pengguna dan penyimpanan progres, sehingga Anda dapat melanjutkan percobaan kapan pun dibutuhkan.</p>
+            <p>Setelah masuk, Anda dapat mengeksplorasi simulasi bandul sederhana, gerak jatuh bebas, dan gerak parabola dengan antarmuka yang responsif dan mudah digunakan.</p>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <p>© 2025 Virtual Lab • Ryl Tampan dan Pemberani</p>
+    </footer>
+
+    <div id="authModal" class="modal hidden" role="dialog" aria-modal="true">
+        <div class="modal-content">
+            <button class="modal-close" id="closeAuthModal" aria-label="Tutup">×</button>
+            <div class="modal-header">
+                <h2 id="authModalTitle">Masuk ke Virtual Lab</h2>
+                <p id="authModalSubtitle">Gunakan akun Anda untuk menyimpan progres eksperimen.</p>
+            </div>
+            <div class="modal-body">
+                <form id="loginForm" class="auth-form" autocomplete="on">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" name="email" required placeholder="anda@example.com">
+                    <label for="loginPassword">Kata Sandi</label>
+                    <input type="password" id="loginPassword" name="password" required minlength="6" placeholder="Minimal 6 karakter">
+                    <button type="submit" class="action-button primary">Masuk</button>
+                </form>
+                <form id="registerForm" class="auth-form hidden" autocomplete="on">
+                    <label for="registerEmail">Email</label>
+                    <input type="email" id="registerEmail" name="email" required placeholder="anda@example.com">
+                    <label for="registerPassword">Kata Sandi</label>
+                    <input type="password" id="registerPassword" name="password" required minlength="6" placeholder="Minimal 6 karakter">
+                    <label for="registerPasswordConfirm">Konfirmasi Kata Sandi</label>
+                    <input type="password" id="registerPasswordConfirm" name="passwordConfirm" required minlength="6" placeholder="Ulangi kata sandi">
+                    <button type="submit" class="action-button primary">Daftar</button>
+                </form>
+            </div>
+            <footer class="modal-footer">
+                <p id="authToggleText">Belum punya akun? <button id="authToggleButton" class="ghost-button" type="button">Daftar</button></p>
+            </footer>
+            <div id="authFeedback" role="status" class="auth-feedback" aria-live="polite"></div>
+        </div>
+    </div>
+
+    <script src="script.js" defer></script>
+</body>
+</html>

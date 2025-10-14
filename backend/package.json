@@ -1,7 +1,7 @@
 {
-  "name": "virtual_lab",
+  "name": "virtual-lab-backend",
   "version": "1.0.0",
-  "description": "Virtual Lab Fisika dengan autentikasi dan progres tersimpan",
+  "description": "Backend Virtual Lab Fisika dengan autentikasi dan penyimpanan progres",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
