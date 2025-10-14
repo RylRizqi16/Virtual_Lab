@@ -589,6 +589,7 @@ function initFreeFall() {
     const mVal = $('#ffMassVal');
     const gVal = $('#ffGravityVal');
     const btnStart = $('#ffStart');
+    const btnPause = $('#ffPause');
     const btnReset = $('#ffReset');
     const posSpan = $('#ffPos');
     const velSpan = $('#ffVel');
@@ -600,26 +601,64 @@ function initFreeFall() {
     let velocity = 0;
     let elapsed = 0;
     let running = false;
+    let paused = false;
     let lastTimestamp = 0;
+    let animationFrameId = null;
+    const maxDisplayHeight = parseFloat(hSlider?.max ?? 100);
+    const topMargin = 60;
+    const groundMargin = 60;
+
+    function updatePauseButton() {
+        if (!btnPause) return;
+        if (!running) {
+            btnPause.disabled = true;
+            btnPause.textContent = 'Pause';
+        } else {
+            btnPause.disabled = false;
+            btnPause.textContent = paused ? 'Lanjutkan' : 'Pause';
+        }
+    }
 
     function drawFreeFall() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = '#d0e7ff';
-        ctx.fillRect(0, canvas.height - 20, canvas.width, 20);
-        const pxPerMeter = (canvas.height - 40) / Math.max(height, 1);
-        const yPx = canvas.height - 20 - y * pxPerMeter;
+        ctx.fillRect(0, canvas.height - groundMargin, canvas.width, groundMargin);
+
+        const usableHeightPx = canvas.height - groundMargin - topMargin;
+        const pxPerMeter = usableHeightPx / Math.max(maxDisplayHeight, 1);
+        const clampedY = Math.max(0, Math.min(y, maxDisplayHeight));
+        const yPx = canvas.height - groundMargin - clampedY * pxPerMeter;
+
+        ctx.strokeStyle = '#9ec5fe';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([6, 6]);
+        ctx.beginPath();
+        ctx.moveTo(canvas.width / 2, canvas.height - groundMargin);
+        ctx.lineTo(canvas.width / 2, topMargin);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
         ctx.beginPath();
         ctx.arc(canvas.width / 2, yPx, 15, 0, Math.PI * 2);
         ctx.fillStyle = '#0a58ca';
         ctx.fill();
 
         if (posSpan) posSpan.textContent = y.toFixed(2);
-        if (velSpan) velSpan.textContent = velocity.toFixed(2);
+        if (velSpan) velSpan.textContent = Math.abs(velocity).toFixed(2);
         if (timeSpan) timeSpan.textContent = elapsed.toFixed(2);
     }
 
     function step(timestamp) {
-        if (!running) return;
+        if (!running) {
+            animationFrameId = null;
+            return;
+        }
+
+        if (paused) {
+            animationFrameId = requestAnimationFrame(step);
+            return;
+        }
+
         if (!lastTimestamp) lastTimestamp = timestamp;
         const dt = Math.min(0.05, (timestamp - lastTimestamp) / 1000);
         lastTimestamp = timestamp;
@@ -630,11 +669,18 @@ function initFreeFall() {
 
         if (y <= 0) {
             y = 0;
+            velocity = 0;
             running = false;
+            paused = false;
+            updatePauseButton();
         }
 
         drawFreeFall();
-        if (running) requestAnimationFrame(step);
+        if (running) {
+            animationFrameId = requestAnimationFrame(step);
+        } else {
+            animationFrameId = null;
+        }
     }
 
     function reset() {
@@ -648,7 +694,23 @@ function initFreeFall() {
         velocity = 0;
         elapsed = 0;
         running = false;
+        paused = false;
         lastTimestamp = 0;
+        if (animationFrameId !== null) {
+            cancelAnimationFrame(animationFrameId);
+            animationFrameId = null;
+        }
+        drawFreeFall();
+        updatePauseButton();
+    }
+
+    function togglePause() {
+        if (!running) return;
+        paused = !paused;
+        if (!paused) {
+            lastTimestamp = 0;
+        }
+        updatePauseButton();
         drawFreeFall();
     }
 
@@ -659,11 +721,18 @@ function initFreeFall() {
     if (gSlider) gSlider.addEventListener('input', reset);
     if (btnStart) btnStart.addEventListener('click', () => {
         if (!running) {
+            if (y <= 0) reset();
             running = true;
+            paused = false;
+            updatePauseButton();
             lastTimestamp = 0;
-            requestAnimationFrame(step);
+            if (animationFrameId !== null) {
+                cancelAnimationFrame(animationFrameId);
+            }
+            animationFrameId = requestAnimationFrame(step);
         }
     });
+    if (btnPause) btnPause.addEventListener('click', togglePause);
     if (btnReset) btnReset.addEventListener('click', reset);
 
     reset();
