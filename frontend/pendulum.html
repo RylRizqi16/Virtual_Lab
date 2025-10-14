@@ -21,9 +21,37 @@
     </nav>
 
     <main class="view-container">
-        <header class="section-header">
-            <h2>Virtual Lab: Bandul (Ayunan Sederhana)</h2>
-            <p>TPB ITB - Eksperimen Penentuan Percepatan Gravitasi (g)</p>
+        <header class="experiment-hero">
+            <div class="experiment-intro">
+                <span class="badge accent">Bandul</span>
+                <h1>Eksperimen Bandul Sederhana</h1>
+                <p>TPB ITB • Penentuan percepatan gravitasi melalui periode ayunan terukur.</p>
+                <div class="experiment-meta">
+                    <div class="meta-item">
+                        <div class="icon-circle small" aria-hidden="true">🎯</div>
+                        <div>
+                            <strong>Tujuan</strong>
+                            <p>Mengestimasi g dari rata-rata periode 10 osilasi.</p>
+                        </div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="icon-circle small" aria-hidden="true">⚙️</div>
+                        <div>
+                            <strong>Parameter</strong>
+                            <p>Panjang tali (L), sudut awal, dan massa beban.</p>
+                        </div>
+                    </div>
+                    <a href="index.html" class="text-link">← Kembali ke Landing</a>
+                </div>
+            </div>
+            <aside class="experiment-cta">
+                <div class="saved-progress" id="savedPendulumCard">
+                    <h3>Rangkuman Progres Tersimpan</h3>
+                    <p id="savedPendulumSummary">Masuk untuk menyimpan dan melihat progres eksperimen.</p>
+                    <button id="syncNowButton" class="action-button outline" type="button" disabled>Masuk untuk Sinkronisasi</button>
+                </div>
+                <button class="action-button primary" type="button" data-open-auth="experiment">Masuk / Sinkronkan</button>
+            </aside>
         </header>
 
         <div class="lab-container">
@@ -39,6 +67,15 @@
             </section>
 
             <aside class="control-panel">
+                <div class="quick-insight">
+                    <h3>Insight Cepat</h3>
+                    <ul class="bullet-list">
+                        <li>Panjang tali lebih besar → periode meningkat proporsional √L.</li>
+                        <li>Sudut kecil (&lt; 15°) menjaga asumsi gerak harmonik sederhana.</li>
+                        <li>Catat minimal 3 percobaan untuk rata-rata g yang stabil.</li>
+                    </ul>
+                </div>
+
                 <h2>Kontrol Eksperimen</h2>
 
                 <div class="control-group">
@@ -82,10 +119,9 @@
                 <div id="averageG">
                     <p>Rata-rata g: <span id="avgGValue">--</span> m/s²</p>
                 </div>
-                <div class="saved-progress" id="savedPendulumCard">
-                    <h3>Rangkuman Progres Tersimpan</h3>
-                    <p id="savedPendulumSummary">Masuk untuk menyimpan dan melihat progres eksperimen.</p>
-                    <button id="syncNowButton" class="action-button outline" type="button" disabled>Masuk untuk Sinkronisasi</button>
+                <div class="control-footer">
+                    <button class="action-button outline" type="button" data-open-auth="experiment">Masuk untuk Simpan Data</button>
+                    <a href="index.html" class="text-link">← Kembali ke Landing</a>
                 </div>
             </aside>
         </div>

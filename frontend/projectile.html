@@ -21,9 +21,36 @@
     </nav>
 
     <main class="view-container">
-        <header class="section-header">
-            <h2>Simulasi Meriam (Gerak Parabola)</h2>
-            <p>Visualisasi lintasan proyektil, jangkauan, dan tinggi maksimum.</p>
+        <header class="experiment-hero">
+            <div class="experiment-intro">
+                <span class="badge accent">Gerak Parabola</span>
+                <h1>Simulasi Meriam (Gerak Parabola)</h1>
+                <p>Visualisasikan lintasan proyektil lengkap dengan waktu terbang, jangkauan, dan tinggi maksimum dalam satu tampilan.</p>
+                <div class="experiment-meta">
+                    <div class="meta-item">
+                        <div class="icon-circle small" aria-hidden="true">🎯</div>
+                        <div>
+                            <strong>Tujuan</strong>
+                            <p>Menemukan kombinasi sudut dan kecepatan awal untuk jangkauan maksimum.</p>
+                        </div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="icon-circle small" aria-hidden="true">⚡</div>
+                        <div>
+                            <strong>Parameter</strong>
+                            <p>Kecepatan awal, sudut tembak, dan gravitasi.</p>
+                        </div>
+                    </div>
+                    <a href="index.html" class="text-link">← Kembali ke Landing</a>
+                </div>
+            </div>
+            <aside class="experiment-cta">
+                <div class="cta-card">
+                    <h3>Sinkronkan Progres</h3>
+                    <p>Masuk untuk menyimpan konfigurasi sudut & kecepatan favorit Anda.</p>
+                    <button class="action-button primary" type="button" data-open-auth="experiment">Masuk / Sinkronkan</button>
+                </div>
+            </aside>
         </header>
         <div class="lab-container">
             <section class="simulation-area">
@@ -35,6 +62,15 @@
                 </div>
             </section>
             <aside class="control-panel">
+                <div class="quick-insight">
+                    <h3>Insight Cepat</h3>
+                    <ul class="bullet-list">
+                        <li>Sudut 45° memberikan jangkauan maksimum saat permukaan datar dan g konstan.</li>
+                        <li>Ubah gravitasi untuk mensimulasikan kondisi planet lain.</li>
+                        <li>Perhatikan tinggi puncak untuk menghitung energi potensial maksimum.</li>
+                    </ul>
+                </div>
+
                 <h2>Kontrol</h2>
                 <div class="control-group">
                     <label for="projSpeed">Kecepatan Awal (v₀):</label>
@@ -53,6 +89,10 @@
                 </div>
                 <button id="projStart" class="action-button primary" type="button">Tembak</button>
                 <button id="projReset" class="action-button secondary" type="button">Reset</button>
+                <div class="control-footer">
+                    <button class="action-button outline" type="button" data-open-auth="experiment">Masuk untuk Simpan Data</button>
+                    <a href="index.html" class="text-link">← Kembali ke Landing</a>
+                </div>
             </aside>
         </div>
     </main>

@@ -21,9 +21,36 @@
     </nav>
 
     <main class="view-container">
-        <header class="section-header">
-            <h2>Simulasi Jatuh Bebas</h2>
-            <p>Observasi gerak lurus berubah beraturan tanpa hambatan udara.</p>
+        <header class="experiment-hero">
+            <div class="experiment-intro">
+                <span class="badge accent">Jatuh Bebas</span>
+                <h1>Simulasi Jatuh Bebas</h1>
+                <p>Visualisasi gerak lurus berubah beraturan tanpa hambatan udara untuk berbagai ketinggian awal.</p>
+                <div class="experiment-meta">
+                    <div class="meta-item">
+                        <div class="icon-circle small" aria-hidden="true">🎯</div>
+                        <div>
+                            <strong>Tujuan</strong>
+                            <p>Mengaitkan ketinggian awal dengan waktu tempuh dan kecepatan sesaat.</p>
+                        </div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="icon-circle small" aria-hidden="true">🧭</div>
+                        <div>
+                            <strong>Parameter</strong>
+                            <p>Ketinggian awal, massa benda, dan gravitasi lokal.</p>
+                        </div>
+                    </div>
+                    <a href="index.html" class="text-link">← Kembali ke Landing</a>
+                </div>
+            </div>
+            <aside class="experiment-cta">
+                <div class="cta-card">
+                    <h3>Sinkronkan Progres</h3>
+                    <p>Masuk untuk menyimpan titik berhenti dan grafik waktu jatuh ke akun Anda.</p>
+                    <button class="action-button primary" type="button" data-open-auth="experiment">Masuk / Sinkronkan</button>
+                </div>
+            </aside>
         </header>
         <div class="lab-container">
             <section class="simulation-area">
@@ -35,6 +62,15 @@
                 </div>
             </section>
             <aside class="control-panel">
+                <div class="quick-insight">
+                    <h3>Insight Cepat</h3>
+                    <ul class="bullet-list">
+                        <li>Waktu jatuh ∝ √(2h/g) — perubahan ketinggian kecil memberi dampak signifikan.</li>
+                        <li>Gunakan slider massa untuk mendiskusikan pengaruh hambatan udara yang diabaikan.</li>
+                        <li>Catat v akhir untuk menghitung energi potensial awal.</li>
+                    </ul>
+                </div>
+
                 <h2>Kontrol</h2>
                 <div class="control-group">
                     <label for="ffHeight">Ketinggian Awal (h):</label>
@@ -55,6 +91,10 @@
                 <button id="ffStart" class="action-button primary" type="button">Mulai</button>
                 <button id="ffPause" class="action-button secondary" type="button">Pause</button>
                 <button id="ffReset" class="action-button secondary" type="button">Reset</button>
+                <div class="control-footer">
+                    <button class="action-button outline" type="button" data-open-auth="experiment">Masuk untuk Simpan Data</button>
+                    <a href="index.html" class="text-link">← Kembali ke Landing</a>
+                </div>
             </aside>
         </div>
     </main>

@@ -18,7 +18,12 @@ const authElements = {
     logoutButton: null,
     authStatusMessage: null,
     progressOverviewBody: null,
+    progressOverviewList: null,
     progressSummary: null,
+    progressMiniList: null,
+    progressMiniCopy: null,
+    progressMiniCount: null,
+    progressMiniLast: null,
     authFeedback: null,
     authModalTitle: null,
     authModalSubtitle: null,
@@ -153,17 +158,34 @@ function updateAuthUI() {
 }
 
 function renderProgressUI() {
-    const { progressOverviewBody, progressSummary, savedPendulumSummary } = authElements;
+    const {
+        progressOverviewBody,
+        progressOverviewList,
+        progressSummary,
+        progressMiniList,
+        progressMiniCopy,
+        progressMiniCount,
+        progressMiniLast,
+        savedPendulumSummary,
+    } = authElements;
+
+    const records = Array.isArray(cachedProgress) ? cachedProgress.slice() : [];
+    const total = records.length;
+    const sortedRecords = records.slice().sort((a, b) => getUpdatedAtTime(b) - getUpdatedAtTime(a));
+    const latestRecord = sortedRecords[0] || null;
+    const latestTimestamp = latestRecord ? getUpdatedAtTime(latestRecord) : 0;
+    const latestDate = latestTimestamp ? new Date(latestTimestamp) : null;
+
     if (progressOverviewBody) {
-        if (!Array.isArray(cachedProgress) || cachedProgress.length === 0) {
+        if (!total) {
             progressOverviewBody.innerHTML = '<tr><td colspan="3">Belum ada progres tersimpan.</td></tr>';
         } else {
             progressOverviewBody.innerHTML = '';
-            cachedProgress.forEach((item) => {
+            sortedRecords.forEach((item) => {
                 const row = document.createElement('tr');
                 const updatedAt = item.updated_at ? new Date(item.updated_at) : null;
                 row.innerHTML = `
-                    <td>${item.experiment}</td>
+                    <td>${formatExperimentName(item.experiment)}</td>
                     <td>${createProgressSummary(item)}</td>
                     <td>${updatedAt ? updatedAt.toLocaleString('id-ID') : '-'}</td>
                 `;
@@ -172,20 +194,270 @@ function renderProgressUI() {
         }
     }
 
-    if (progressSummary) {
-        if (!cachedProgress.length) {
-            progressSummary.textContent = 'Belum ada data tersimpan.';
+    if (progressOverviewList) {
+        progressOverviewList.innerHTML = '';
+        if (!total) {
+            const li = document.createElement('li');
+            li.textContent = 'Masuk untuk menyimpan eksperimen favorit Anda.';
+            progressOverviewList.appendChild(li);
         } else {
-            progressSummary.textContent = `Tersimpan ${cachedProgress.length} eksperimen.`;
+            sortedRecords.slice(0, 3).forEach((item) => {
+                const li = document.createElement('li');
+                li.innerHTML = `<strong>${formatExperimentName(item.experiment)}</strong> — ${createProgressSummary(item)}`;
+                progressOverviewList.appendChild(li);
+            });
         }
     }
 
+    if (progressSummary) {
+        progressSummary.textContent = total
+            ? `Tersimpan ${total.toLocaleString('id-ID')} eksperimen.`
+            : 'Belum ada data tersimpan.';
+    }
+
+    if (progressMiniCopy) {
+        progressMiniCopy.textContent = total
+            ? 'Sinkronisasi terbaru tercatat otomatis. Rekap ringkas di bawah.'
+            : 'Masuk untuk mulai menyimpan eksperimen dan dapatkan rekap otomatis.';
+    }
+
+    if (progressMiniCount) {
+        progressMiniCount.textContent = total.toLocaleString('id-ID');
+    }
+
+    if (progressMiniLast) {
+        progressMiniLast.textContent = latestDate ? latestDate.toLocaleString('id-ID') : '-';
+    }
+
+    if (progressMiniList) {
+        let highlightItem = progressMiniList.querySelector('[data-slot="recent"]');
+        if (total && latestRecord) {
+            const summaryText = `${formatExperimentName(latestRecord.experiment)} • ${createProgressSummary(latestRecord)}`;
+            if (!highlightItem) {
+                highlightItem = document.createElement('li');
+                highlightItem.dataset.slot = 'recent';
+                progressMiniList.appendChild(highlightItem);
+            }
+            highlightItem.textContent = `Terbaru: ${summaryText}`;
+        } else if (highlightItem) {
+            highlightItem.remove();
+        }
+    }
+
+    updateHeroFeedProgress(sortedRecords);
+
     if (savedPendulumSummary) {
-        const pendulumData = cachedProgress.find((item) => item.experiment === 'pendulum');
+        const pendulumData = sortedRecords.find((item) => item.experiment === 'pendulum');
         savedPendulumSummary.textContent = pendulumData
             ? createProgressSummary(pendulumData)
             : 'Belum ada progres bandul tersimpan. Jalankan eksperimen untuk merekam hasil.';
     }
+}
+
+function formatExperimentName(experiment) {
+    switch (experiment) {
+        case 'pendulum':
+            return 'Bandul';
+        case 'freefall':
+            return 'Jatuh Bebas';
+        case 'projectile':
+            return 'Gerak Parabola';
+        default: {
+            if (!experiment) return '-';
+            return experiment.toString().replace(/[-_]/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
+        }
+    }
+}
+
+function getUpdatedAtTime(record) {
+    if (!record || !record.updated_at) return 0;
+    const time = new Date(record.updated_at).getTime();
+    return Number.isFinite(time) ? time : 0;
+}
+
+const heroFeedBaseMessages = [
+    { title: 'Bandul', detail: 'g = 9,78 m/s² tercatat otomatis.' },
+    { title: 'Jatuh Bebas', detail: 'Objek berhenti di 35 m untuk analisis energi.' },
+    { title: 'Gerak Parabola', detail: 'Sudut optimal 43° ditemukan.' },
+    { title: 'Bandul', detail: 'Periode rata-rata 1,99 s pada L = 1,2 m.' },
+];
+let heroFeedElement = null;
+let heroFeedProgressEntries = [];
+let heroFeedInitialized = false;
+
+const journeyStepDetails = [
+    {
+        title: 'Pilih Simulasi',
+        body: 'Mulai dari landing page atau navigasi atas. Semua modul memiliki kontrol dan layout yang konsisten.',
+    },
+    {
+        title: 'Atur Parameter',
+        body: 'Gunakan slider untuk L, sudut, kecepatan, atau gravitasi. Nilai numerik ditampilkan langsung untuk presisi.',
+    },
+    {
+        title: 'Jalankan & Catat',
+        body: 'Visualisasi real-time lengkap dengan overlay info dan pencatatan otomatis setiap percobaan.',
+    },
+    {
+        title: 'Sinkronisasi',
+        body: 'Masuk untuk menyimpan progres, bandingkan eksperimen, dan lanjutkan di perangkat lain kapan pun.',
+    },
+];
+
+function randomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function renderHeroFeed(entries) {
+    if (!heroFeedElement) return;
+    heroFeedElement.innerHTML = '';
+    entries.slice(0, 3).forEach((entry) => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span class="feed-dot"></span><strong>${entry.title}</strong> • ${entry.detail}`;
+        heroFeedElement.appendChild(li);
+    });
+}
+
+function pickHeroFeedBase(count) {
+    const pool = heroFeedBaseMessages.slice();
+    pool.sort(() => Math.random() - 0.5);
+    return pool.slice(0, count);
+}
+
+function rotateHeroFeed() {
+    if (!heroFeedElement) return;
+    const baseCount = Math.max(0, 3 - heroFeedProgressEntries.length);
+    const entries = [...heroFeedProgressEntries];
+    if (baseCount > 0) {
+        entries.push(...pickHeroFeedBase(baseCount));
+    }
+    if (!entries.length) {
+        entries.push(...pickHeroFeedBase(3));
+    }
+    renderHeroFeed(entries);
+}
+
+function initHeroFeed() {
+    if (heroFeedInitialized) return;
+    heroFeedElement = $('#heroFeed');
+    if (!heroFeedElement) return;
+    heroFeedInitialized = true;
+    const refreshButton = $('#refreshHeroFeed');
+    if (refreshButton) {
+        refreshButton.addEventListener('click', rotateHeroFeed);
+    }
+    rotateHeroFeed();
+    window.setInterval(rotateHeroFeed, 12000);
+}
+
+function updateHeroFeedProgress(records) {
+    if (!heroFeedElement) return;
+    heroFeedProgressEntries = (records || [])
+        .slice(0, 3)
+        .map((item) => ({
+            title: formatExperimentName(item.experiment),
+            detail: createProgressSummary(item),
+        }))
+        .filter((entry) => entry.detail && entry.detail !== '-');
+    rotateHeroFeed();
+}
+
+function initHeadlineRotator() {
+    const lines = $$('.headline-line');
+    if (lines.length <= 1) return;
+    let index = lines.findIndex((line) => line.classList.contains('is-active'));
+    if (index < 0) index = 0;
+    setInterval(() => {
+        lines[index].classList.remove('is-active');
+        index = (index + 1) % lines.length;
+        lines[index].classList.add('is-active');
+    }, 4200);
+}
+
+function initCountupMetrics() {
+    const counters = $$('[data-countup]');
+    counters.forEach((element) => {
+        const target = Number(element.dataset.countup);
+        if (!Number.isFinite(target)) return;
+        const isPercentage = element.id === 'metricRetention';
+        const duration = 1400;
+        const startTime = performance.now();
+
+        function step(now) {
+            const progress = Math.min((now - startTime) / duration, 1);
+            const value = Math.round(progress * target);
+            element.textContent = isPercentage ? `${value}%` : value.toLocaleString('id-ID');
+            if (progress < 1) {
+                requestAnimationFrame(step);
+            }
+        }
+
+        requestAnimationFrame(step);
+    });
+}
+
+function initJourneySteps() {
+    const steps = $$('.journey-step');
+    const detailContainer = $('#journeyDetail');
+    if (!steps.length || !detailContainer) return;
+    const detailTitle = detailContainer.querySelector('h3');
+    const detailBody = detailContainer.querySelector('p');
+
+    function activateStep(index) {
+        const detail = journeyStepDetails[index] || journeyStepDetails[0];
+        steps.forEach((btn, idx) => {
+            const isActive = idx === index;
+            btn.classList.toggle('is-active', isActive);
+            btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            btn.setAttribute('tabindex', isActive ? '0' : '-1');
+        });
+        if (detailTitle) detailTitle.textContent = detail.title;
+        if (detailBody) detailBody.textContent = detail.body;
+    }
+
+    steps.forEach((step, index) => {
+        step.setAttribute('role', 'tab');
+        step.setAttribute('aria-selected', step.classList.contains('is-active') ? 'true' : 'false');
+        step.setAttribute('tabindex', step.classList.contains('is-active') ? '0' : '-1');
+        step.addEventListener('click', () => activateStep(index));
+        step.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                activateStep(index);
+            }
+        });
+    });
+
+    const initialIndex = steps.findIndex((step) => step.classList.contains('is-active'));
+    activateStep(initialIndex >= 0 ? initialIndex : 0);
+}
+
+function initLiveStats() {
+    const experimentStat = $('#liveStatExperiments');
+    const syncStat = $('#liveStatSync');
+    const activeStat = $('#liveStatActive');
+    const stats = [
+        { element: experimentStat, min: 2, max: 6, interval: 5500 },
+        { element: syncStat, min: 1, max: 3, interval: 6500 },
+        { element: activeStat, min: 1, max: 2, interval: 4800 },
+    ];
+    stats.forEach((stat) => {
+        if (!stat.element) return;
+        let currentValue = Number(stat.element.textContent.replace(/[^\d]/g, '')) || 0;
+        setInterval(() => {
+            currentValue += randomInt(stat.min, stat.max);
+            stat.element.textContent = currentValue.toLocaleString('id-ID');
+        }, stat.interval + randomInt(0, 1500));
+    });
+}
+
+function initLandingPageEnhancements() {
+    if (!$('#homeHero')) return;
+    initHeadlineRotator();
+    initCountupMetrics();
+    initHeroFeed();
+    initJourneySteps();
+    initLiveStats();
 }
 
 function createProgressSummary(item) {
@@ -317,7 +589,12 @@ function initAuth() {
     authElements.logoutButton = $('#logoutButton');
     authElements.authStatusMessage = $('#authStatusMessage');
     authElements.progressOverviewBody = $('#progressOverviewBody');
+    authElements.progressOverviewList = $('#progressOverviewList');
     authElements.progressSummary = $('#progressSummary');
+    authElements.progressMiniList = $('#progressMiniList');
+    authElements.progressMiniCopy = $('#progressMiniCopy');
+    authElements.progressMiniCount = $('#progressMiniCount');
+    authElements.progressMiniLast = $('#progressMiniLast');
     authElements.authFeedback = $('#authFeedback');
     authElements.authModalTitle = $('#authModalTitle');
     authElements.authModalSubtitle = $('#authModalSubtitle');
@@ -339,6 +616,9 @@ function initAuth() {
             setAuthMode(nextMode);
         });
     }
+    $$('[data-open-auth]').forEach((trigger) => {
+        trigger.addEventListener('click', () => openAuthModal('login'));
+    });
     if (closeAuthModalBtn) closeAuthModalBtn.addEventListener('click', closeAuthModal);
     if (authElements.modal) {
         authElements.modal.addEventListener('click', (event) => {
@@ -885,5 +1165,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initPendulum();
     initFreeFall();
     initProjectile();
+    initLandingPageEnhancements();
     loadCurrentUser().then(() => loadProgress(true));
 });
