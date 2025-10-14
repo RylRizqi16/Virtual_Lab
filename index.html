@@ -17,6 +17,7 @@
             <li><button class="link" data-view="pendulum">Bandul</button></li>
             <li><button class="link" data-view="freefall">Jatuh Bebas</button></li>
             <li><button class="link" data-view="projectile">Meriam</button></li>
+            <li><button id="authButton" class="link outline">Masuk</button></li>
         </ul>
     </nav>
 
@@ -29,6 +30,40 @@
                 <div class="hero-actions">
                 </div>
             </header>
+
+            <section class="auth-status-card" id="authStatusCard">
+                <div>
+                    <h3>Status Pengguna</h3>
+                    <p id="authStatusMessage">Masuk untuk menyimpan progres eksperimen Anda.</p>
+                </div>
+                <div class="auth-actions">
+                    <button id="authCtaButton" class="action-button primary">Masuk / Daftar</button>
+                    <button id="logoutButton" class="action-button secondary hidden">Keluar</button>
+                </div>
+            </section>
+
+            <section class="user-progress" id="landingProgressSection">
+                <header>
+                    <h3>Progres Eksperimen Tersimpan</h3>
+                    <p id="progressSummary">Belum ada data tersimpan.</p>
+                </header>
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Eksperimen</th>
+                                <th>Ringkasan</th>
+                                <th>Diperbarui</th>
+                            </tr>
+                        </thead>
+                        <tbody id="progressOverviewBody">
+                            <tr>
+                                <td colspan="3">Masuk untuk melihat progres Anda.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
 
             <section class="cards">
                 <div class="card" data-view="pendulum">
@@ -112,6 +147,11 @@
                     </div>
                     <div id="averageG">
                         <p>Rata-rata g: <span id="avgGValue">--</span> m/s²</p>
+                    </div>
+                    <div class="saved-progress" id="savedPendulumCard">
+                        <h3>Rangkuman Progres Tersimpan</h3>
+                        <p id="savedPendulumSummary">Masuk untuk menyimpan dan melihat progres eksperimen.</p>
+                        <button id="syncNowButton" class="action-button outline">Sinkronkan Sekarang</button>
                     </div>
                 </aside>
             </div>
@@ -198,6 +238,39 @@
     <footer class="site-footer">
         <p>© 2025 Virtual Lab • Desain minimalis-futuristis putih & biru</p>
     </footer>
+
+    <!-- Authentication Modal -->
+    <div id="authModal" class="modal hidden" role="dialog" aria-modal="true">
+        <div class="modal-content">
+            <button class="modal-close" id="closeAuthModal" aria-label="Tutup">×</button>
+            <div class="modal-header">
+                <h2 id="authModalTitle">Masuk ke Virtual Lab</h2>
+                <p id="authModalSubtitle">Gunakan akun Anda untuk menyimpan progres eksperimen.</p>
+            </div>
+            <div class="modal-body">
+                <form id="loginForm" class="auth-form" autocomplete="on">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" name="email" required placeholder="anda@example.com">
+                    <label for="loginPassword">Kata Sandi</label>
+                    <input type="password" id="loginPassword" name="password" required minlength="6" placeholder="Minimal 6 karakter">
+                    <button type="submit" class="action-button primary">Masuk</button>
+                </form>
+                <form id="registerForm" class="auth-form hidden" autocomplete="on">
+                    <label for="registerEmail">Email</label>
+                    <input type="email" id="registerEmail" name="email" required placeholder="anda@example.com">
+                    <label for="registerPassword">Kata Sandi</label>
+                    <input type="password" id="registerPassword" name="password" required minlength="6" placeholder="Minimal 6 karakter">
+                    <label for="registerPasswordConfirm">Konfirmasi Kata Sandi</label>
+                    <input type="password" id="registerPasswordConfirm" name="passwordConfirm" required minlength="6" placeholder="Ulangi kata sandi">
+                    <button type="submit" class="action-button primary">Daftar</button>
+                </form>
+            </div>
+            <footer class="modal-footer">
+                <p id="authToggleText">Belum punya akun? <button id="authToggleButton" class="ghost-button" type="button">Daftar</button></p>
+            </footer>
+            <div id="authFeedback" role="status" class="auth-feedback" aria-live="polite"></div>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>

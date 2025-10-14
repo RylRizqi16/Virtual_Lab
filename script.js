@@ -3,6 +3,294 @@ const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => Array.from(document.querySelectorAll(sel));
 const degToRad = (deg) => deg * (Math.PI / 180);
 
+// Authentication & API helpers
+const STORAGE_TOKEN_KEY = 'vlab_auth_token';
+const API_BASE = '/api';
+let authToken = localStorage.getItem(STORAGE_TOKEN_KEY);
+let currentUser = null;
+let cachedProgress = [];
+
+// Auth-related DOM elements
+let authModal;
+let loginForm;
+let registerForm;
+let authButton;
+let authCtaButton;
+let logoutButton;
+let authStatusMessage;
+let progressOverviewBody;
+let progressSummary;
+let authFeedback;
+let authModalTitle;
+let authModalSubtitle;
+let authToggleText;
+let authToggleButton;
+let savedPendulumSummary;
+let syncNowButton;
+
+function setAuthToken(token) {
+    if (token) {
+        authToken = token;
+        localStorage.setItem(STORAGE_TOKEN_KEY, token);
+    } else {
+        authToken = null;
+        localStorage.removeItem(STORAGE_TOKEN_KEY);
+    }
+}
+
+function toggleModalVisibility(show) {
+    if (!authModal) return;
+    if (show) {
+        authModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    } else {
+        authModal.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+}
+
+function setAuthMode(mode) {
+    if (!loginForm || !registerForm) return;
+    const isLogin = mode === 'login';
+    loginForm.classList.toggle('hidden', !isLogin);
+    registerForm.classList.toggle('hidden', isLogin);
+    if (authModalTitle) {
+        authModalTitle.textContent = isLogin ? 'Masuk ke Virtual Lab' : 'Buat Akun Virtual Lab';
+    }
+    if (authModalSubtitle) {
+        authModalSubtitle.textContent = isLogin
+            ? 'Gunakan akun Anda untuk menyimpan progres eksperimen.'
+            : 'Daftar gratis untuk menyimpan dan menyinkronkan eksperimen.';
+    }
+    if (authToggleText && authToggleButton) {
+        const toggleTextNode = authToggleText.childNodes[0];
+        if (isLogin) {
+            if (toggleTextNode) toggleTextNode.textContent = 'Belum punya akun? ';
+            authToggleButton.textContent = 'Daftar';
+            authToggleButton.dataset.mode = 'register';
+        } else {
+            if (toggleTextNode) toggleTextNode.textContent = 'Sudah punya akun? ';
+            authToggleButton.textContent = 'Masuk';
+            authToggleButton.dataset.mode = 'login';
+        }
+    }
+    if (authFeedback) authFeedback.textContent = '';
+}
+
+function openAuthModal(mode = 'login') {
+    setAuthMode(mode);
+    toggleModalVisibility(true);
+}
+
+function closeAuthModal() {
+    toggleModalVisibility(false);
+}
+
+async function apiRequest(path, options = {}) {
+    const opts = { method: 'GET', ...options };
+    opts.headers = { ...(options.headers || {}) };
+    if (opts.body && typeof opts.body !== 'string') {
+        opts.body = JSON.stringify(opts.body);
+        if (!opts.headers['Content-Type']) {
+            opts.headers['Content-Type'] = 'application/json';
+        }
+    }
+    if (!opts.headers['Accept']) {
+        opts.headers['Accept'] = 'application/json';
+    }
+    if (authToken) {
+        opts.headers.Authorization = `Bearer ${authToken}`;
+    }
+
+    const response = await fetch(`${API_BASE}${path}`, opts);
+    const contentType = response.headers.get('content-type') || '';
+    const isJson = contentType.includes('application/json');
+    const payload = isJson ? await response.json() : await response.text();
+    if (!response.ok) {
+        const message = isJson ? (payload.message || payload.error) : payload;
+        throw new Error(message || 'Terjadi kesalahan pada server');
+    }
+    return payload;
+}
+
+function updateAuthUI() {
+    const isLoggedIn = Boolean(currentUser && authToken);
+    if (authButton) {
+        authButton.textContent = isLoggedIn ? currentUser.email : 'Masuk';
+        authButton.classList.toggle('outline', !isLoggedIn);
+    }
+    if (authCtaButton) {
+        authCtaButton.textContent = isLoggedIn ? 'Kelola Akun' : 'Masuk / Daftar';
+    }
+    if (logoutButton) {
+        logoutButton.classList.toggle('hidden', !isLoggedIn);
+    }
+    if (syncNowButton) {
+        syncNowButton.disabled = !isLoggedIn;
+        syncNowButton.textContent = isLoggedIn ? 'Sinkronkan Sekarang' : 'Masuk untuk Sinkronisasi';
+    }
+    if (authStatusMessage) {
+        authStatusMessage.textContent = isLoggedIn
+            ? `Masuk sebagai ${currentUser.email}. Progres Anda akan tersimpan otomatis.`
+            : 'Masuk untuk menyimpan progres eksperimen Anda.';
+    }
+    if (!isLoggedIn) {
+        cachedProgress = [];
+        renderProgressUI();
+    } else {
+        renderProgressUI();
+    }
+}
+
+function renderProgressUI() {
+    if (!progressOverviewBody) return;
+    if (!Array.isArray(cachedProgress) || cachedProgress.length === 0) {
+        progressOverviewBody.innerHTML = '<tr><td colspan="3">Belum ada progres tersimpan.</td></tr>';
+        if (progressSummary) progressSummary.textContent = 'Belum ada data tersimpan.';
+        if (savedPendulumSummary) {
+            savedPendulumSummary.textContent = 'Masuk untuk menyimpan dan melihat progres eksperimen.';
+        }
+        return;
+    }
+
+    progressOverviewBody.innerHTML = '';
+    cachedProgress.forEach((item) => {
+        const row = document.createElement('tr');
+        const updatedAt = item.updated_at ? new Date(item.updated_at) : null;
+        const summary = createProgressSummary(item);
+        row.innerHTML = `
+            <td>${item.experiment}</td>
+            <td>${summary}</td>
+            <td>${updatedAt ? updatedAt.toLocaleString('id-ID') : '-'}</td>
+        `;
+        progressOverviewBody.appendChild(row);
+    });
+
+    if (progressSummary) {
+        progressSummary.textContent = `Tersimpan ${cachedProgress.length} eksperimen.`;
+    }
+
+    if (savedPendulumSummary) {
+        const pendulumData = cachedProgress.find((item) => item.experiment === 'pendulum');
+        savedPendulumSummary.textContent = pendulumData
+            ? createProgressSummary(pendulumData)
+            : 'Belum ada progres bandul tersimpan. Jalankan eksperimen untuk merekam hasil.';
+    }
+}
+
+function createProgressSummary(item) {
+    if (!item || !item.payload) return '-';
+    try {
+        const data = typeof item.payload === 'string' ? JSON.parse(item.payload) : item.payload;
+        if (item.experiment === 'pendulum' && data) {
+            return `L=${Number(data.L).toFixed(2)} m, T=${Number(data.T).toFixed(3)} s, g=${Number(data.g).toFixed(3)} m/s²`;
+        }
+        return data.summary || JSON.stringify(data);
+    } catch (err) {
+        return '-';
+    }
+}
+
+async function loadCurrentUser() {
+    if (!authToken) {
+        currentUser = null;
+        updateAuthUI();
+        return;
+    }
+    try {
+        const data = await apiRequest('/me');
+        currentUser = data.user || null;
+    } catch (err) {
+        console.warn('Token tidak valid, menghapus sesi.', err);
+        setAuthToken(null);
+        currentUser = null;
+    }
+    updateAuthUI();
+}
+
+async function loadProgress(force = false) {
+    if (!currentUser || !authToken) return;
+    if (!force && cachedProgress.length > 0) {
+        renderProgressUI();
+        return;
+    }
+    try {
+        const data = await apiRequest('/progress');
+        cachedProgress = data.records || data.progress || [];
+        renderProgressUI();
+    } catch (err) {
+        console.error('Gagal memuat progres:', err.message);
+        if (authFeedback) authFeedback.textContent = err.message;
+    }
+}
+
+async function recordProgress(experiment, payload) {
+    if (!currentUser || !authToken) return;
+    try {
+        await apiRequest('/progress', {
+            method: 'POST',
+            body: { experiment, payload },
+        });
+        await loadProgress(true);
+    } catch (err) {
+        console.error('Gagal menyimpan progres:', err.message);
+    }
+}
+
+async function handleLogin(event) {
+    event.preventDefault();
+    if (!loginForm) return;
+    const formData = new FormData(loginForm);
+    const email = formData.get('email');
+    const password = formData.get('password');
+    try {
+        const data = await apiRequest('/login', {
+            method: 'POST',
+            body: { email, password },
+        });
+        setAuthToken(data.token);
+        currentUser = data.user;
+        await loadProgress(true);
+        updateAuthUI();
+        closeAuthModal();
+    } catch (err) {
+        if (authFeedback) authFeedback.textContent = err.message;
+    }
+}
+
+async function handleRegister(event) {
+    event.preventDefault();
+    if (!registerForm) return;
+    const formData = new FormData(registerForm);
+    const email = formData.get('email');
+    const password = formData.get('password');
+    const passwordConfirm = formData.get('passwordConfirm');
+    if (password !== passwordConfirm) {
+        if (authFeedback) authFeedback.textContent = 'Konfirmasi kata sandi tidak sama.';
+        return;
+    }
+    try {
+        await apiRequest('/register', {
+            method: 'POST',
+            body: { email, password },
+        });
+        if (authFeedback) authFeedback.textContent = 'Registrasi berhasil. Silakan masuk.';
+        setAuthMode('login');
+        if (loginForm) {
+            loginForm.querySelector('[name="email"]').value = email;
+        }
+    } catch (err) {
+        if (authFeedback) authFeedback.textContent = err.message;
+    }
+}
+
+function logoutUser() {
+    setAuthToken(null);
+    currentUser = null;
+    cachedProgress = [];
+    updateAuthUI();
+}
+
 // Pendulum global variables
 let pCanvas, pCtx, pCenter;
 let L = 1.0; // pendulum length
@@ -255,6 +543,13 @@ function endExperiment() {
     dataLog.push({ L, T10: totalTimeSeconds, T: periodT, g: calculatedG });
     updateResultsTable();
     updateAverageG();
+    recordProgress('pendulum', {
+        L,
+        T10: totalTimeSeconds,
+        T: periodT,
+        g: calculatedG,
+        capturedAt: new Date().toISOString(),
+    });
 
     isExperimenting = false;
     if (startStopButton) {
@@ -616,7 +911,7 @@ function switchView(viewName) {
                 resetButton = document.getElementById('resetButton');
                 displayL = document.getElementById('displayL');
                 displayT = document.getElementById('displayT');
-                resultsTableBody = document.getElementById('resultsTable')?.querySelector('tbody');
+                resultsTableBody = document.getElementById('resultsTableBody');
                 avgGValue = document.getElementById('avgGValue');
                 
                 // Set up event listeners
@@ -655,13 +950,51 @@ function switchView(viewName) {
 
 // Add click listeners for nav and landing cards
 document.addEventListener('DOMContentLoaded', () => {
+    authModal = $('#authModal');
+    loginForm = $('#loginForm');
+    registerForm = $('#registerForm');
+    authButton = $('#authButton');
+    authCtaButton = $('#authCtaButton');
+    logoutButton = $('#logoutButton');
+    authStatusMessage = $('#authStatusMessage');
+    progressOverviewBody = $('#progressOverviewBody');
+    progressSummary = $('#progressSummary');
+    authFeedback = $('#authFeedback');
+    authModalTitle = $('#authModalTitle');
+    authModalSubtitle = $('#authModalSubtitle');
+    authToggleText = $('#authToggleText');
+    authToggleButton = $('#authToggleButton');
+    savedPendulumSummary = $('#savedPendulumSummary');
+    syncNowButton = $('#syncNowButton');
+
+    const closeAuthModalBtn = $('#closeAuthModal');
+
+    if (loginForm) loginForm.addEventListener('submit', handleLogin);
+    if (registerForm) registerForm.addEventListener('submit', handleRegister);
+    if (authButton) authButton.addEventListener('click', () => openAuthModal('login'));
+    if (authCtaButton) authCtaButton.addEventListener('click', () => openAuthModal('login'));
+    if (logoutButton) logoutButton.addEventListener('click', logoutUser);
+    if (authToggleButton) authToggleButton.addEventListener('click', () => {
+        const nextMode = authToggleButton.dataset.mode || 'register';
+        setAuthMode(nextMode);
+    });
+    if (closeAuthModalBtn) closeAuthModalBtn.addEventListener('click', closeAuthModal);
+    if (authModal) {
+        authModal.addEventListener('click', (event) => {
+            if (event.target === authModal) closeAuthModal();
+        });
+    }
+    if (syncNowButton) syncNowButton.addEventListener('click', () => loadProgress(true));
+
     // Initial view
     switchView('landing');
     // All elements with [data-view]
-    $$("[data-view]").forEach(el => {
+    $$('[data-view]').forEach(el => {
         el.addEventListener('click', e => {
             const view = el.getAttribute('data-view');
             if (view) switchView(view);
         });
     });
+
+    loadCurrentUser().then(() => loadProgress(true));
 });

@@ -44,6 +44,7 @@ body {
 .nav-links { list-style: none; display: flex; gap: 10px; }
 .nav-links .link { background: transparent; border: 1px solid #dbe6ff; color: var(--color-primary); padding: 8px 14px; border-radius: 999px; cursor: pointer; }
 .nav-links .link:hover { background: #f0f7ff; }
+.nav-links .link.outline { border-style: dashed; }
 
 /* Views */
 .view-container { max-width: 1200px; margin: 0 auto 40px; padding: 0 20px; }
@@ -62,6 +63,15 @@ body {
 .card:hover { transform: translateY(-3px); box-shadow: var(--shadow-heavy); }
 .card h3 { color: var(--color-primary); margin-bottom: 6px; }
 .pill { display: inline-block; padding: 6px 10px; border-radius: 999px; background: #f0f7ff; color: var(--color-primary); font-size: 12px; margin-top: 10px; }
+
+.auth-status-card { display: flex; justify-content: space-between; align-items: center; gap: 20px; background: var(--color-card); border-radius: var(--radius); padding: 20px; margin-top: 12px; box-shadow: var(--shadow-light); }
+.auth-status-card h3 { margin-bottom: 6px; color: var(--color-primary); }
+.auth-actions { display: flex; gap: 12px; align-items: center; }
+.auth-actions .action-button { width: auto; min-width: 150px; }
+
+.user-progress { margin-top: 24px; background: var(--color-card); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow-light); }
+.user-progress header { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; align-items: baseline; }
+.user-progress h3 { color: var(--color-primary); }
 
 /* Section header */
 .section-header { text-align: center; margin: 20px 0; }
@@ -86,6 +96,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance
 .action-button.secondary { background: #70829f; color: white; }
 .action-button.danger { background: var(--color-danger); color: white; }
 .action-button.outline { background: transparent; border: 1px solid #dbe6ff; color: var(--color-primary); }
+.action-button:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
 
 .table-scroll { max-height: 250px; overflow-y: auto; border: 1px solid #e7efff; border-radius: 12px; }
 table { width: 100%; border-collapse: collapse; }
@@ -93,6 +104,26 @@ thead { background-color: #f0f7ff; position: sticky; top: 0; }
 th, td { padding: 8px; text-align: center; border-bottom: 1px solid #eef3ff; }
 
 #averageG { margin-top: 10px; padding: 10px; background-color: #fff7e6; border: 1px solid #ffe7b8; border-radius: 12px; text-align: center; font-weight: bold; }
+
+.saved-progress { margin-top: 20px; padding: 16px; border: 1px dashed #bcd3ff; border-radius: 12px; background: #f8fbff; display: flex; flex-direction: column; gap: 12px; }
+.saved-progress h3 { color: var(--color-primary); }
+
+.hidden { display: none !important; }
+
+.modal { position: fixed; inset: 0; background: rgba(9, 30, 66, 0.5); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 1000; }
+.modal .modal-content { background: var(--color-card); border-radius: 18px; box-shadow: var(--shadow-heavy); width: min(420px, 100%); position: relative; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+.modal-header h2 { color: var(--color-primary); margin-bottom: 4px; }
+.modal-close { position: absolute; top: 16px; right: 16px; background: transparent; border: none; font-size: 24px; cursor: pointer; color: #70829f; }
+.auth-form { display: flex; flex-direction: column; gap: 10px; }
+.auth-form label { font-weight: 600; color: #3e4a6b; }
+.auth-form input { padding: 10px 12px; border: 1px solid #dbe6ff; border-radius: 10px; background: #f7faff; }
+.auth-form input:focus { outline: 2px solid #bcd3ff; }
+.modal-footer { text-align: center; font-size: 0.9rem; color: #54648c; }
+.ghost-button { border: none; background: none; color: var(--color-primary); cursor: pointer; font-weight: 600; }
+.ghost-button:hover { text-decoration: underline; }
+.auth-feedback { min-height: 24px; font-size: 0.9rem; color: var(--color-danger); text-align: center; }
+
+.modal.hidden { display: none; }
 
 #info-overlay, .info-overlay { position: absolute; top: 10px; left: 10px; background: rgba(255, 255, 255, 0.85); padding: 10px; border-radius: 12px; font-size: 0.9em; box-shadow: var(--shadow-light); }
 
