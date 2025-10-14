@@ -1,41 +1,51 @@
-const path = require('path');
-const fs = require('fs');
-const sqlite3 = require('sqlite3').verbose();
+const { Pool } = require('pg');
+const { DATABASE_URL } = require('./env');
 
-const dataDir = path.join(__dirname, '..', 'data');
-if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
+if (!DATABASE_URL) {
+    throw new Error('DATABASE_URL belum dikonfigurasi. Setel kredensial koneksi Postgres (mis. dari Neon) sebelum menjalankan backend.');
 }
-const dbPath = path.join(dataDir, 'virtual_lab.db');
 
-const db = new sqlite3.Database(dbPath);
+const shouldUseSSL = !/localhost|127\.0\.0\.1/i.test(DATABASE_URL);
+
+const pool = new Pool({
+    connectionString: DATABASE_URL,
+    ssl: shouldUseSSL ? { rejectUnauthorized: false } : false,
+});
+
+pool.on('error', (err) => {
+    console.error('Kesalahan koneksi database:', err.message);
+});
 
 const initSql = `
 CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     email TEXT NOT NULL UNIQUE,
     password_hash TEXT NOT NULL,
-    created_at TEXT DEFAULT (datetime('now'))
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS user_progress (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     experiment TEXT NOT NULL,
     payload TEXT NOT NULL,
-    created_at TEXT DEFAULT (datetime('now')),
-    updated_at TEXT DEFAULT (datetime('now')),
-    UNIQUE(user_id, experiment),
-    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, experiment)
 );
 `;
 
-db.exec(initSql, (err) => {
-    if (err) {
-        console.error('Gagal menginisialisasi database:', err.message);
-    } else {
-        console.log('Database siap digunakan di', dbPath);
+(async () => {
+    try {
+        await pool.query(initSql);
+        console.log('Koneksi PostgreSQL berhasil. Tabel siap digunakan.');
+    } catch (error) {
+        console.error('Gagal menginisialisasi skema database:', error.message);
+        throw error;
     }
-});
+})();
 
-module.exports = db;
+module.exports = {
+    query: (text, params) => pool.query(text, params),
+    pool,
+};

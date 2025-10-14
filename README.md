@@ -24,14 +24,13 @@ Virtual_Lab_Lanjutan/
 │   ├── config/
 │   │   ├── database.js
 │   │   └── env.js
-│   └── data/ (dibuat otomatis saat runtime)
 └── README.md
 ```
 
 ## Fitur Baru
 
 - **Autentikasi Pengguna** menggunakan email & kata sandi (JWT + bcrypt).
-- **Penyimpanan Progres Eksperimen** ke database SQLite (bisa diganti ke layanan lain).
+- **Penyimpanan Progres Eksperimen** ke database PostgreSQL terkelola (mis. Neon) yang siap produksi.
 - **UI Multi-Halaman**: landing page terpisah dari masing-masing simulasi (Bandul, Jatuh Bebas, Gerak Parabola).
 - **Sinkronisasi Cloud**: hasil eksperimen bandul otomatis dikirim ke backend saat pengukuran selesai.
 
@@ -45,18 +44,27 @@ npm install
 npm run dev
 ```
 
-Buat file `.env` (opsional) di `backend/` bila ingin mengubah konfigurasi:
+Buat file `.env` di `backend/` untuk konfigurasi lokal:
 
 ```
 PORT=3000
 JWT_SECRET=ubah-rahasia-anda
 CLIENT_ORIGIN=http://localhost:5173
 SALT_ROUNDS=10
+DATABASE_URL=postgres://user:password@host/dbname
 ```
 
 ### 2. Frontend
 
 Frontend bersifat statis. Saat pengembangan lokal, bisa dijalankan dengan server static (contoh `npx serve`) atau langsung melalui ekstensi Live Server di VS Code. Pastikan variabel JavaScript `window.__VLAB_API_BASE__` diarahkan ke origin backend bila berbeda host.
+
+### Menyiapkan Neon sebagai Database
+
+1. Buat proyek baru di [Neon](https://neon.tech) dan catat connection string Postgres yang disediakan.
+2. Tambahkan connection string tersebut ke file `.env` lokal sebagai `DATABASE_URL`.
+3. Jalankan `npm install` di folder `backend/` untuk menarik dependensi `pg`.
+4. Di Vercel, tambahkan variable lingkungan `DATABASE_URL` dengan nilai connection string yang sama (gunakan opsi `Encrypted`).
+5. Jika ingin memulai dengan tabel kosong, tidak perlu menjalankan migrasi manual—`backend/config/database.js` akan membuat tabel `users` dan `user_progress` secara otomatis.
 
 ## Deployment Rekomendasi
 
@@ -79,7 +87,8 @@ Frontend bersifat statis. Saat pengembangan lokal, bisa dijalankan dengan server
 4. Set environment variable melalui Vercel Dashboard:
    - `JWT_SECRET`
    - `SALT_ROUNDS` (opsional)
-   - `CLIENT_ORIGIN` diarahkan ke domain frontend.
+  - `CLIENT_ORIGIN` diarahkan ke domain frontend.
+  - `DATABASE_URL` (Neon / layanan Postgres lain, gunakan string koneksi dengan SSL).
 
 ### Konfigurasi `vercel.json`
 
@@ -97,6 +106,6 @@ Frontend dapat tetap di-host di Netlify/GitHub Pages. Jika ingin men-deploy fron
 
 ## Catatan Penting
 
-- SQLite bersifat file-based; pada Vercel (serverless) penyimpanan tidak persisten antar instans. Untuk produksi gunakan database terkelola (Supabase, Neon, PlanetScale, dsb.) dan modifikasi `backend/config/database.js` agar memakai koneksi tersebut.
+- Pastikan `DATABASE_URL` mengarah ke instance Postgres yang mendukung SSL (Neon, Supabase, dsb.). Koneksi lokal tanpa SSL juga didukung selama host menggunakan `localhost`.
 - Biasakan mengaktifkan HTTPS/SSL agar token JWT aman saat transmisi.
 - Uji setiap halaman setelah build untuk memastikan pemanggilan API lintas-origin berhasil.

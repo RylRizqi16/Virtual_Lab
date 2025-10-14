@@ -7,7 +7,7 @@ function generateToken(user) {
     return jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
 }
 
-function register(req, res) {
+async function register(req, res) {
     const { email, password } = req.body || {};
     if (!email || !password) {
         return res.status(400).json({ message: 'Email dan kata sandi wajib diisi.' });
@@ -16,70 +16,63 @@ function register(req, res) {
         return res.status(400).json({ message: 'Kata sandi minimal 6 karakter.' });
     }
 
-    db.get('SELECT id FROM users WHERE email = ?', [email], async (err, row) => {
-        if (err) {
-            console.error('Kesalahan saat mengecek pengguna:', err);
-            return res.status(500).json({ message: 'Terjadi kesalahan pada server.' });
-        }
-        if (row) {
+    try {
+        const existing = await db.query('SELECT id FROM users WHERE email = $1', [email]);
+        if (existing.rowCount > 0) {
             return res.status(409).json({ message: 'Email sudah terdaftar.' });
         }
-        try {
-            const hash = await bcrypt.hash(password, SALT_ROUNDS);
-            db.run('INSERT INTO users (email, password_hash) VALUES (?, ?)', [email, hash], function (insertErr) {
-                if (insertErr) {
-                    console.error('Kesalahan saat menyimpan pengguna:', insertErr);
-                    return res.status(500).json({ message: 'Terjadi kesalahan pada server.' });
-                }
-                return res.status(201).json({ message: 'Registrasi berhasil.' });
-            });
-        } catch (hashErr) {
-            console.error('Kesalahan hash kata sandi:', hashErr);
-            return res.status(500).json({ message: 'Tidak dapat memproses permintaan.' });
+
+        const hash = await bcrypt.hash(password, SALT_ROUNDS);
+        await db.query('INSERT INTO users (email, password_hash) VALUES ($1, $2)', [email, hash]);
+        return res.status(201).json({ message: 'Registrasi berhasil.' });
+    } catch (error) {
+        if (error.code === '23505') {
+            return res.status(409).json({ message: 'Email sudah terdaftar.' });
         }
-    });
+        console.error('Kesalahan saat registrasi pengguna:', error);
+        return res.status(500).json({ message: 'Terjadi kesalahan pada server.' });
+    }
 }
 
-function login(req, res) {
+async function login(req, res) {
     const { email, password } = req.body || {};
     if (!email || !password) {
         return res.status(400).json({ message: 'Email dan kata sandi wajib diisi.' });
     }
 
-    db.get('SELECT id, email, password_hash FROM users WHERE email = ?', [email], async (err, user) => {
-        if (err) {
-            console.error('Kesalahan saat mencari pengguna:', err);
-            return res.status(500).json({ message: 'Terjadi kesalahan pada server.' });
-        }
+    try {
+        const result = await db.query('SELECT id, email, password_hash FROM users WHERE email = $1', [email]);
+        const user = result.rows[0];
         if (!user) {
             return res.status(401).json({ message: 'Email atau kata sandi salah.' });
         }
-        try {
-            const match = await bcrypt.compare(password, user.password_hash);
-            if (!match) {
-                return res.status(401).json({ message: 'Email atau kata sandi salah.' });
-            }
-            const token = generateToken(user);
-            return res.json({ token, user: { id: user.id, email: user.email } });
-        } catch (compareErr) {
-            console.error('Kesalahan saat memverifikasi kata sandi:', compareErr);
-            return res.status(500).json({ message: 'Tidak dapat memproses permintaan.' });
+
+        const match = await bcrypt.compare(password, user.password_hash);
+        if (!match) {
+            return res.status(401).json({ message: 'Email atau kata sandi salah.' });
         }
-    });
+
+        const token = generateToken(user);
+        return res.json({ token, user: { id: user.id, email: user.email } });
+    } catch (error) {
+        console.error('Kesalahan saat login pengguna:', error);
+        return res.status(500).json({ message: 'Terjadi kesalahan pada server.' });
+    }
 }
 
-function getMe(req, res) {
+async function getMe(req, res) {
     const userId = req.user.id;
-    db.get('SELECT id, email, created_at FROM users WHERE id = ?', [userId], (err, user) => {
-        if (err) {
-            console.error('Kesalahan saat mengambil pengguna:', err);
-            return res.status(500).json({ message: 'Terjadi kesalahan pada server.' });
-        }
+    try {
+        const result = await db.query('SELECT id, email, created_at FROM users WHERE id = $1', [userId]);
+        const user = result.rows[0];
         if (!user) {
             return res.status(404).json({ message: 'Pengguna tidak ditemukan.' });
         }
         return res.json({ user });
-    });
+    } catch (error) {
+        console.error('Kesalahan saat mengambil data pengguna:', error);
+        return res.status(500).json({ message: 'Terjadi kesalahan pada server.' });
+    }
 }
 
 function authMiddleware(req, res, next) {
