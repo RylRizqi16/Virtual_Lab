@@ -1,5 +1,15 @@
 {
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/backend/api/index.js" }
+  ],
+  "routes": [
+    {
+      "src": "/",
+      "dest": "frontend/index.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "frontend/$1"
+    }
   ]
 }

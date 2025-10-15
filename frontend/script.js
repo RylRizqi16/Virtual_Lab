@@ -2,10 +2,19 @@ const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => Array.from(document.querySelectorAll(sel));
 const degToRad = (deg) => deg * (Math.PI / 180);
 
-const STORAGE_TOKEN_KEY = 'vlab_auth_token';
-const API_BASE = window.__VLAB_API_BASE__ || '/api';
+const STORAGE_TOKEN_KEY = 'simulab_auth_token';
+const LEGACY_STORAGE_TOKEN_KEY = 'vlab_auth_token';
+const API_BASE = window.__SIMULAB_API_BASE__ || window.__VLAB_API_BASE__ || '/api';
 
 let authToken = localStorage.getItem(STORAGE_TOKEN_KEY);
+if (!authToken) {
+    const legacyToken = localStorage.getItem(LEGACY_STORAGE_TOKEN_KEY);
+    if (legacyToken) {
+        authToken = legacyToken;
+        localStorage.setItem(STORAGE_TOKEN_KEY, legacyToken);
+        localStorage.removeItem(LEGACY_STORAGE_TOKEN_KEY);
+    }
+}
 let currentUser = null;
 let cachedProgress = [];
 const quizModules = [];
@@ -66,9 +75,11 @@ function setAuthToken(token) {
     if (token) {
         authToken = token;
         localStorage.setItem(STORAGE_TOKEN_KEY, token);
+        localStorage.removeItem(LEGACY_STORAGE_TOKEN_KEY);
     } else {
         authToken = null;
         localStorage.removeItem(STORAGE_TOKEN_KEY);
+        localStorage.removeItem(LEGACY_STORAGE_TOKEN_KEY);
     }
 }
 
@@ -92,7 +103,7 @@ function setAuthMode(mode) {
     registerForm.classList.toggle('hidden', isLogin);
 
     if (authModalTitle) {
-        authModalTitle.textContent = isLogin ? 'Masuk ke Virtual Lab' : 'Buat Akun Virtual Lab';
+    authModalTitle.textContent = isLogin ? 'Masuk ke SimuLab' : 'Buat Akun SimuLab';
     }
     if (authModalSubtitle) {
         authModalSubtitle.textContent = isLogin

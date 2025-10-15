@@ -1,11 +1,11 @@
-# Virtual Lab Lanjutan
+# SimuLab
 
-Virtual Lab Fisika dengan autentikasi pengguna dan penyimpanan progres eksperimen berbasis database. Proyek dipisahkan menjadi frontend statis dan backend API sehingga mudah di-deploy ke layanan berbeda (misalnya Netlify/GitHub Pages untuk frontend dan Vercel/AWS Lambda untuk backend).
+SimuLab adalah laboratorium fisika virtual dengan autentikasi pengguna dan penyimpanan progres eksperimen berbasis database. Proyek dipisahkan menjadi frontend statis dan backend API sehingga mudah di-deploy ke layanan berbeda (misalnya Netlify/GitHub Pages untuk frontend dan Vercel/AWS Lambda untuk backend).
 
 ## Struktur Proyek
 
 ```
-Virtual_Lab_Lanjutan/
+SimuLab/
 ├── frontend/
 │   ├── index.html
 │   ├── pendulum.html
@@ -56,7 +56,7 @@ DATABASE_URL=postgres://user:password@host/dbname
 
 ### 2. Frontend
 
-Frontend bersifat statis. Saat pengembangan lokal, bisa dijalankan dengan server static (contoh `npx serve`) atau langsung melalui ekstensi Live Server di VS Code. Pastikan variabel JavaScript `window.__VLAB_API_BASE__` diarahkan ke origin backend bila berbeda host.
+Frontend bersifat statis. Saat pengembangan lokal, bisa dijalankan dengan server static (contoh `npx serve`) atau langsung melalui ekstensi Live Server di VS Code. Pastikan variabel JavaScript `window.__SIMULAB_API_BASE__` diarahkan ke origin backend bila berbeda host (variabel lama `window.__VLAB_API_BASE__` masih didukung sebagai fallback).
 
 ### Menyiapkan Neon sebagai Database
 
@@ -74,7 +74,7 @@ Frontend bersifat statis. Saat pengembangan lokal, bisa dijalankan dengan server
 2. Jika backend berada di domain berbeda, tambahkan sebelum memuat `script.js`:
    ```html
    <script>
-       window.__VLAB_API_BASE__ = 'https://nama-backend.vercel.app/api';
+     window.__SIMULAB_API_BASE__ = 'https://nama-backend.vercel.app/api';
    </script>
    <script src="script.js" defer></script>
    ```
