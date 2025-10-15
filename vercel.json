@@ -12,10 +12,27 @@
       "use": "@vercel/static"
     }
   ],
-  "rewrites": [
-    { "source": "/api/(.*)", "destination": "/backend/api/index.js" }
-  ],
   "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/backend/api/index.js"
+    },
+    {
+      "src": "/pendulum.html",
+      "dest": "/frontend/pendulum.html"
+    },
+    {
+      "src": "/freefall.html",
+      "dest": "/frontend/freefall.html"
+    },
+    {
+      "src": "/projectile.html",
+      "dest": "/frontend/projectile.html"
+    },
+    {
+      "src": "/(.*\\.(?:css|js|png|jpg|jpeg|gif|svg|webp|ico|json|txt|woff|woff2|ttf|mp3|mp4|webm|pdf))$",
+      "dest": "/frontend/$1"
+    },
     {
       "src": "/",
       "dest": "/frontend/index.html"

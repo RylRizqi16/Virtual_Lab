@@ -66,43 +66,61 @@ Frontend bersifat statis. Saat pengembangan lokal, bisa dijalankan dengan server
 4. Di Vercel, tambahkan variable lingkungan `DATABASE_URL` dengan nilai connection string yang sama (gunakan opsi `Encrypted`).
 5. Jika ingin memulai dengan tabel kosong, tidak perlu menjalankan migrasi manual—`backend/config/database.js` akan membuat tabel `users` dan `user_progress` secara otomatis.
 
-## Deployment Rekomendasi
+## Deployment ke Vercel + Neon
 
-### Frontend (Netlify / GitHub Pages)
+Konfigurasi repo ini memungkinkan frontend dan backend dirilis dalam satu proyek Vercel, sementara database dijalankan di Neon. Berikut alur lengkapnya.
 
-1. Deploy folder `frontend/` sebagai situs statis.
-2. Jika backend berada di domain berbeda, tambahkan sebelum memuat `script.js`:
-   ```html
-   <script>
-     window.__SIMULAB_API_BASE__ = 'https://nama-backend.vercel.app/api';
-   </script>
-   <script src="script.js" defer></script>
-   ```
+### 1. Siapkan database di Neon
 
-### Backend (Vercel)
+1. Masuk ke [Neon](https://neon.tech) dan buat project baru.
+2. Salin connection string Postgres (formatnya `postgres://user:password@host/dbname`).
+3. Aktifkan opsi `Require SSL` agar koneksi aman; gunakan connection string SSL-ready jika disediakan.
+4. Opsional: buat role/database terpisah untuk staging dan production agar pengelolaan lebih mudah.
 
-1. Deploy folder `backend/` sebagai Project Node.js di Vercel.
-2. `backend/api/index.js` sudah disiapkan agar bertindak sebagai handler serverless.
-3. Pastikan `vercel.json` di root repository tersedia (lihat di bawah).
-4. Set environment variable melalui Vercel Dashboard:
-   - `JWT_SECRET`
-   - `SALT_ROUNDS` (opsional)
-  - `CLIENT_ORIGIN` diarahkan ke domain frontend.
-  - `DATABASE_URL` (Neon / layanan Postgres lain, gunakan string koneksi dengan SSL).
+### 2. Impor repository ke Vercel
+
+1. Klik **New Project** di dashboard Vercel, pilih repository GitHub ini.
+2. Biarkan `Framework Preset` kosong (proyek multi-build). Vercel akan membaca `vercel.json` di root.
+3. Gunakan Node.js 18+ (default Vercel saat ini sudah sesuai).
+
+### 3. Atur environment variables
+
+Tambahkan variabel-variabel berikut di tab **Settings → Environment Variables** untuk setiap environment (Production / Preview / Development):
+
+- `DATABASE_URL` → connection string dari Neon.
+- `JWT_SECRET` → rahasia untuk penandatanganan token.
+- `SALT_ROUNDS` → jumlah salt bcrypt (default 10 bila dikosongkan di kode).
+- `CLIENT_ORIGIN` → origin frontend (contoh `https://simulab.vercel.app`).
+
+Vercel akan menanam variabel ini untuk fungsi serverless di `backend/api/index.js`.
+
+### 4. Deploy
+
+1. Jalankan build pertama langsung dari Vercel; `vercel.json` memastikan backend dan frontend ter-deploy bersama.
+2. Setelah deploy, akses domain Vercel Anda. Frontend otomatis tersedia di path root (`/`), sementara endpoint API dapat diakses melalui `/api/*`.
+3. Karena frontend dan backend berada di domain yang sama, `script.js` otomatis menggunakan `/api` tanpa perlu mengatur `window.__SIMULAB_API_BASE__`. Jika suatu saat backend terpisah domain, override variabel tersebut di tag `<script>` sebelum `script.js`.
 
 ### Konfigurasi `vercel.json`
 
-File `vercel.json` mengarahkan semua request `/api/*` ke backend:
+`vercel.json` di root repo sudah men-define build dan routing berikut:
 
 ```json
 {
+  "builds": [
+    { "src": "backend/api/index.js", "use": "@vercel/node", "config": { "includeFiles": "backend/**" } },
+    { "src": "frontend/**", "use": "@vercel/static" }
+  ],
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/backend/api/index.js" }
+  ],
+  "routes": [
+    { "src": "/", "dest": "/frontend/index.html" },
+    { "src": "/(.*)", "dest": "/frontend/$1" }
   ]
 }
 ```
 
-Frontend dapat tetap di-host di Netlify/GitHub Pages. Jika ingin men-deploy frontend di Vercel juga, buat proyek Vercel lain yang menargetkan folder `frontend/` dan atur build command ke `null` (deploy statis).
+Anda bisa menyesuaikan file ini bila perlu (mis. menambahkan headers untuk cache, route khusus, dsb.).
 
 ## Catatan Penting
 
