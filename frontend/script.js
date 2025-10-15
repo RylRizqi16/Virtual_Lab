@@ -6,6 +6,15 @@ const STORAGE_TOKEN_KEY = 'simulab_auth_token';
 const LEGACY_STORAGE_TOKEN_KEY = 'vlab_auth_token';
 const API_BASE = window.__SIMULAB_API_BASE__ || window.__VLAB_API_BASE__ || '/api';
 
+const bodyDataset = document.body ? document.body.dataset : {};
+const urlParams = new URLSearchParams(window.location.search);
+
+const APP_CONTEXT = {
+    isRootAuthPage: bodyDataset.authRoot === 'true',
+    autoOpenLogin: urlParams.get('login') === '1',
+    redirectAfterAuth: urlParams.get('redirect') || null,
+};
+
 let authToken = localStorage.getItem(STORAGE_TOKEN_KEY);
 if (!authToken) {
     const legacyToken = localStorage.getItem(LEGACY_STORAGE_TOKEN_KEY);
@@ -69,7 +78,41 @@ const authElements = {
     savedFreefallSummary: null,
     savedProjectileSummary: null,
     syncNowButton: null,
+    userDisplay: null,
 };
+
+function buildRedirectTarget() {
+    const path = window.location.pathname.replace(/^\/+/, '');
+    const search = window.location.search;
+    const hash = window.location.hash;
+    if (!path) return '';
+    return `${path}${search}${hash}`;
+}
+
+function openLandingLogin(redirectTarget) {
+    const params = new URLSearchParams();
+    params.set('login', '1');
+    if (redirectTarget) {
+        params.set('redirect', redirectTarget);
+    }
+    const query = params.toString();
+    window.location.href = `index.html${query ? `?${query}` : ''}`;
+}
+
+function clearAuthQueryParams() {
+    const params = new URLSearchParams(window.location.search);
+    let modified = false;
+    ['login', 'redirect'].forEach((key) => {
+        if (params.has(key)) {
+            params.delete(key);
+            modified = true;
+        }
+    });
+    if (!modified) return;
+    const newQuery = params.toString();
+    const newUrl = `${window.location.pathname}${newQuery ? `?${newQuery}` : ''}${window.location.hash}`;
+    window.history.replaceState(null, document.title, newUrl);
+}
 
 function setAuthToken(token) {
     if (token) {
@@ -168,12 +211,21 @@ function updateAuthUI() {
         logoutButton,
         authStatusMessage,
         syncNowButton,
+        userDisplay,
     } = authElements;
 
     const isLoggedIn = Boolean(currentUser && authToken);
+    const hasModal = Boolean(authElements.modal);
     if (authButton) {
-        authButton.textContent = isLoggedIn ? (currentUser.email || 'Akun Anda') : 'Masuk';
-        authButton.classList.toggle('outline', !isLoggedIn);
+        if (hasModal) {
+            authButton.textContent = isLoggedIn ? 'Kelola Akun' : 'Masuk';
+            authButton.classList.toggle('outline', !isLoggedIn);
+            authButton.classList.remove('hidden');
+        } else {
+            authButton.textContent = 'Masuk';
+            authButton.classList.add('outline');
+            authButton.classList.toggle('hidden', isLoggedIn);
+        }
     }
     if (authCtaButton) {
         authCtaButton.textContent = isLoggedIn ? 'Kelola Akun' : 'Masuk / Daftar';
@@ -189,6 +241,10 @@ function updateAuthUI() {
         authStatusMessage.textContent = isLoggedIn
             ? `Masuk sebagai ${currentUser.email}. Progres Anda akan tersimpan otomatis.`
             : 'Masuk untuk menyimpan progres eksperimen Anda.';
+    }
+    if (userDisplay) {
+        userDisplay.textContent = isLoggedIn ? (currentUser.email || 'Pengguna') : '';
+        userDisplay.classList.toggle('is-hidden', !isLoggedIn);
     }
 
     if (!isLoggedIn) {
@@ -814,6 +870,12 @@ async function handleLogin(event) {
         currentUser = data.user;
         closeAuthModal();
         updateAuthUI();
+        const redirectTarget = APP_CONTEXT.redirectAfterAuth;
+        if (redirectTarget) {
+            APP_CONTEXT.redirectAfterAuth = null;
+            window.location.href = redirectTarget;
+            return;
+        }
         await loadProgress(true);
     } catch (error) {
         if (authFeedback) authFeedback.textContent = error.message;
@@ -879,12 +941,23 @@ function initAuth() {
     authElements.savedFreefallSummary = $('#savedFreefallSummary');
     authElements.savedProjectileSummary = $('#savedProjectileSummary');
     authElements.syncNowButton = $('#syncNowButton');
+    authElements.userDisplay = $('#userDisplay');
 
     const closeAuthModalBtn = $('#closeAuthModal');
+    const hasModal = Boolean(authElements.modal);
 
     if (authElements.loginForm) authElements.loginForm.addEventListener('submit', handleLogin);
     if (authElements.registerForm) authElements.registerForm.addEventListener('submit', handleRegister);
-    if (authElements.authButton) authElements.authButton.addEventListener('click', () => openAuthModal('login'));
+    if (authElements.authButton) {
+        if (hasModal) {
+            authElements.authButton.addEventListener('click', () => openAuthModal('login'));
+        } else {
+            authElements.authButton.addEventListener('click', () => {
+                const target = buildRedirectTarget();
+                openLandingLogin(target);
+            });
+        }
+    }
     if (authElements.authCtaButton) authElements.authCtaButton.addEventListener('click', () => openAuthModal('login'));
     if (authElements.logoutButton) authElements.logoutButton.addEventListener('click', logoutUser);
     if (authElements.authToggleButton) {
@@ -893,11 +966,13 @@ function initAuth() {
             setAuthMode(nextMode);
         });
     }
-    $$('[data-open-auth]').forEach((trigger) => {
-        trigger.addEventListener('click', () => openAuthModal('login'));
-    });
+    if (hasModal) {
+        $$('[data-open-auth]').forEach((trigger) => {
+            trigger.addEventListener('click', () => openAuthModal('login'));
+        });
+    }
     if (closeAuthModalBtn) closeAuthModalBtn.addEventListener('click', closeAuthModal);
-    if (authElements.modal) {
+    if (hasModal) {
         authElements.modal.addEventListener('click', (event) => {
             if (event.target === authElements.modal) closeAuthModal();
         });
@@ -1525,5 +1600,30 @@ document.addEventListener('DOMContentLoaded', () => {
     initFreeFall();
     initProjectile();
     initLandingPageEnhancements();
-    loadCurrentUser().then(() => loadProgress(true));
+
+    loadCurrentUser()
+        .then(() => {
+            if (APP_CONTEXT.redirectAfterAuth && authToken) {
+                const target = APP_CONTEXT.redirectAfterAuth;
+                APP_CONTEXT.redirectAfterAuth = null;
+                if (target) {
+                    clearAuthQueryParams();
+                    window.location.href = target;
+                    return null;
+                }
+            }
+            return loadProgress(true);
+        })
+        .catch((error) => {
+            console.error('Gagal menyiapkan sesi awal:', error);
+        })
+        .finally(() => {
+            const shouldAutoOpen = authElements.modal && APP_CONTEXT.autoOpenLogin && !authToken;
+            if (shouldAutoOpen) {
+                openAuthModal('login');
+                clearAuthQueryParams();
+            } else if (APP_CONTEXT.isRootAuthPage) {
+                clearAuthQueryParams();
+            }
+        });
 });

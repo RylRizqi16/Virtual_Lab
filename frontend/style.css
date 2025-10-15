@@ -73,6 +73,18 @@ body {
 }
 .nav-links .link:hover { background: #f0f7ff; }
 .nav-links .link.outline { border-style: dashed; }
+.user-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: rgba(10, 88, 202, 0.12);
+    color: var(--color-primary);
+    font-weight: 600;
+    min-width: 140px;
+    text-align: center;
+}
 
 .view-container { max-width: 1200px; margin: 0 auto 40px; padding: 0 20px; }
 
@@ -304,6 +316,10 @@ th, td { padding: 8px; text-align: center; border-bottom: 1px solid #eef3ff; }
 
 .modal.hidden { display: none; }
 
+/* Utility class untuk menyembunyikan elemen saat belum login */
+.is-hidden {
+    display: none !important;
+}
 #info-overlay, .info-overlay { position: absolute; top: 10px; left: 10px; background: rgba(255, 255, 255, 0.85); padding: 10px; border-radius: 12px; font-size: 0.9em; box-shadow: var(--shadow-light); }
 
 .note { font-size: 0.85em; color: var(--color-secondary); margin-top: 5px; font-style: italic; }

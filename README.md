@@ -33,6 +33,7 @@ SimuLab/
 - **Penyimpanan Progres Eksperimen** ke database PostgreSQL terkelola (mis. Neon) yang siap produksi.
 - **UI Multi-Halaman**: landing page terpisah dari masing-masing simulasi (Bandul, Jatuh Bebas, Gerak Parabola).
 - **Sinkronisasi Cloud**: hasil eksperimen bandul otomatis dikirim ke backend saat pengukuran selesai.
+- **Single Sign-On Opsional**: login cukup sekali di landing page SimuLab untuk sinkronisasi lintas modul, sementara tamu tetap bisa langsung menjalankan simulasi.
 
 ## Menjalankan Secara Lokal
 

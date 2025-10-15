@@ -16,7 +16,9 @@
             <li><a class="link" href="pendulum.html">Bandul</a></li>
             <li><a class="link" href="freefall.html">Jatuh Bebas</a></li>
             <li><a class="link" href="projectile.html">Meriam</a></li>
+            <li><span id="userDisplay" class="user-badge is-hidden" aria-live="polite"></span></li>
             <li><button id="authButton" class="link outline" type="button">Masuk</button></li>
+            <li><button id="logoutButton" class="link outline hidden" type="button">Keluar</button></li>
         </ul>
     </nav>
 
@@ -47,9 +49,8 @@
             <aside class="experiment-cta">
                 <div class="saved-progress" id="savedFreefallCard">
                     <h3>Rangkuman Progres Tersimpan</h3>
-                    <p id="savedFreefallSummary">Masuk untuk menyimpan dan melihat progres eksperimen.</p>
+                    <p id="savedFreefallSummary">Masuk untuk menyimpan progres simulasi. Mode tamu tidak menyinkronkan hasil.</p>
                 </div>
-                <button class="action-button primary" type="button" data-open-auth="experiment">Masuk / Sinkronkan</button>
             </aside>
         </header>
         <div class="lab-container">
@@ -73,7 +74,7 @@
 
                 <section class="quiz-card" id="freefallQuiz" aria-live="polite">
                     <h3>Quiz Jatuh Bebas</h3>
-                    <p id="freefallQuizPrompt">Masuk untuk mendapatkan soal acak dan uji perhitungan Anda dengan simulasi.</p>
+                    <p id="freefallQuizPrompt">Gunakan simulasi untuk menjawab soal acak dan validasi perhitungan Anda.</p>
                     <div class="quiz-input">
                         <label for="freefallQuizAnswer">Jawaban Anda (detik)</label>
                         <input type="number" id="freefallQuizAnswer" step="0.01" min="0" placeholder="0.00" disabled>
@@ -110,7 +111,7 @@
                 <button id="ffPause" class="action-button secondary" type="button">Pause</button>
                 <button id="ffReset" class="action-button secondary" type="button">Reset</button>
                 <div class="control-footer">
-                    <button class="action-button outline" type="button" data-open-auth="experiment">Masuk untuk Simpan Data</button>
+                    <p class="note">Masuk agar progres tersimpan di akun SimuLab Anda. Sebagai tamu, data hanya terlihat selama sesi ini.</p>
                     <a href="index.html" class="text-link">← Kembali ke Landing</a>
                 </div>
             </aside>
@@ -120,38 +121,6 @@
     <footer class="site-footer">
     <p>© 2025 SimuLab</p>
     </footer>
-
-    <div id="authModal" class="modal hidden" role="dialog" aria-modal="true">
-        <div class="modal-content">
-            <button class="modal-close" id="closeAuthModal" aria-label="Tutup">×</button>
-            <div class="modal-header">
-                <h2 id="authModalTitle">Masuk ke SimuLab</h2>
-                <p id="authModalSubtitle">Gunakan akun Anda untuk menyimpan progres eksperimen.</p>
-            </div>
-            <div class="modal-body">
-                <form id="loginForm" class="auth-form" autocomplete="on">
-                    <label for="loginEmail">Email</label>
-                    <input type="email" id="loginEmail" name="email" required placeholder="anda@example.com">
-                    <label for="loginPassword">Kata Sandi</label>
-                    <input type="password" id="loginPassword" name="password" required minlength="6" placeholder="Minimal 6 karakter">
-                    <button type="submit" class="action-button primary">Masuk</button>
-                </form>
-                <form id="registerForm" class="auth-form hidden" autocomplete="on">
-                    <label for="registerEmail">Email</label>
-                    <input type="email" id="registerEmail" name="email" required placeholder="anda@example.com">
-                    <label for="registerPassword">Kata Sandi</label>
-                    <input type="password" id="registerPassword" name="password" required minlength="6" placeholder="Minimal 6 karakter">
-                    <label for="registerPasswordConfirm">Konfirmasi Kata Sandi</label>
-                    <input type="password" id="registerPasswordConfirm" name="passwordConfirm" required minlength="6" placeholder="Ulangi kata sandi">
-                    <button type="submit" class="action-button primary">Daftar</button>
-                </form>
-            </div>
-            <footer class="modal-footer">
-                <p id="authToggleText">Belum punya akun? <button id="authToggleButton" class="ghost-button" type="button">Daftar</button></p>
-            </footer>
-            <div id="authFeedback" role="status" class="auth-feedback" aria-live="polite"></div>
-        </div>
-    </div>
 
     <script src="script.js" defer></script>
 </body>
