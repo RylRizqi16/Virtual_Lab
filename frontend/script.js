@@ -8,6 +8,33 @@ const API_BASE = window.__VLAB_API_BASE__ || '/api';
 let authToken = localStorage.getItem(STORAGE_TOKEN_KEY);
 let currentUser = null;
 let cachedProgress = [];
+const quizModules = [];
+
+function registerQuizModule(module) {
+    if (module && typeof module.onAuthStateChange === 'function') {
+        quizModules.push(module);
+    }
+}
+
+function formatNumberLocale(value, fractionDigits = 2) {
+    const numericValue = Number(value);
+    if (!Number.isFinite(numericValue)) return '--';
+    return numericValue.toLocaleString('id-ID', {
+        minimumFractionDigits: fractionDigits,
+        maximumFractionDigits: fractionDigits,
+    });
+}
+
+function decimalStep(decimals) {
+    if (!Number.isFinite(decimals) || decimals <= 0) return '1';
+    const step = 1 / Math.pow(10, decimals);
+    return step.toFixed(decimals);
+}
+
+function decimalPlaceholder(decimals) {
+    if (!Number.isFinite(decimals) || decimals <= 0) return '0';
+    return `0.${'0'.repeat(decimals)}`;
+}
 
 const authElements = {
     modal: null,
@@ -157,6 +184,13 @@ function updateAuthUI() {
         cachedProgress = [];
     }
     renderProgressUI();
+    quizModules.forEach((module) => {
+        try {
+            module.onAuthStateChange(isLoggedIn);
+        } catch (error) {
+            console.error('Gagal memperbarui modul quiz:', error);
+        }
+    });
 }
 
 function renderProgressUI() {
@@ -378,6 +412,202 @@ function updateHeroFeedProgress(records) {
         }))
         .filter((entry) => entry.detail && entry.detail !== '-');
     rotateHeroFeed();
+}
+
+function initQuizModule({
+    experiment,
+    promptSelector,
+    answerSelector,
+    submitSelector,
+    refreshSelector,
+    feedbackSelector,
+    statsSelector,
+}) {
+    const promptEl = $(promptSelector);
+    const answerInput = $(answerSelector);
+    const submitButton = $(submitSelector);
+    const refreshButton = $(refreshSelector);
+    const feedbackEl = feedbackSelector ? $(feedbackSelector) : null;
+    const statsContainer = statsSelector ? $(statsSelector) : null;
+
+    if (!promptEl || !answerInput || !submitButton || !refreshButton) {
+        return null;
+    }
+
+    const statsElements = statsContainer
+        ? {
+              attempts: statsContainer.querySelector('[data-quiz-attr="attempts"]'),
+              correct: statsContainer.querySelector('[data-quiz-attr="correct"]'),
+              incorrect: statsContainer.querySelector('[data-quiz-attr="incorrect"]'),
+          }
+        : null;
+
+    const module = {
+        experiment,
+        promptEl,
+        answerInput,
+        submitButton,
+        refreshButton,
+        feedbackEl,
+        statsContainer,
+        statsElements,
+        currentQuestion: null,
+        isLoggedIn: false,
+        isLoading: false,
+        enableControls(enable) {
+            const isEnabled = enable && !this.isLoading;
+            this.answerInput.disabled = !isEnabled;
+            this.submitButton.disabled = !isEnabled;
+            this.refreshButton.disabled = !enable;
+        },
+        setLoading(loading) {
+            this.isLoading = loading;
+            this.answerInput.disabled = !this.isLoggedIn || loading;
+            this.submitButton.disabled = !this.isLoggedIn || loading;
+            this.refreshButton.disabled = !this.isLoggedIn || loading;
+            if (loading && this.feedbackEl) {
+                this.feedbackEl.classList.remove('success', 'error');
+                this.feedbackEl.textContent = 'Memproses...';
+            }
+        },
+        setPrompt(text) {
+            if (this.promptEl) {
+                this.promptEl.textContent = text;
+            }
+        },
+        setFeedback(message, type) {
+            if (!this.feedbackEl) return;
+            this.feedbackEl.classList.remove('success', 'error');
+            if (type) {
+                this.feedbackEl.classList.add(type);
+            }
+            this.feedbackEl.textContent = message || '';
+        },
+        updateStats(stats) {
+            if (!this.statsElements) return;
+            const attempts = Number(stats?.attempts) || 0;
+            const correct = Number(stats?.correctcount ?? stats?.correct ?? 0);
+            const incorrect = Number(stats?.incorrectcount ?? stats?.incorrect ?? 0);
+            if (this.statsElements.attempts) {
+                this.statsElements.attempts.textContent = attempts.toLocaleString('id-ID');
+            }
+            if (this.statsElements.correct) {
+                this.statsElements.correct.textContent = correct.toLocaleString('id-ID');
+            }
+            if (this.statsElements.incorrect) {
+                this.statsElements.incorrect.textContent = incorrect.toLocaleString('id-ID');
+            }
+        },
+        renderQuestion(question) {
+            if (!question) return;
+            this.currentQuestion = question;
+            const decimals = Number.isFinite(question.answerDecimalPlaces) ? question.answerDecimalPlaces : 2;
+            this.setPrompt(question.prompt);
+            this.answerInput.step = decimalStep(decimals);
+            this.answerInput.placeholder = decimalPlaceholder(decimals);
+            if (question.unit) {
+                this.answerInput.setAttribute('aria-label', `Jawaban dalam ${question.unit}`);
+            }
+        },
+        async fetchQuestion(force = false) {
+            if (!this.isLoggedIn) {
+                this.enableControls(false);
+                this.setPrompt('Masuk untuk memulai quiz dan simpan hasilnya.');
+                return;
+            }
+            if (this.isLoading && !force) return;
+            this.setLoading(true);
+            try {
+                const data = await apiRequest(`/quiz/${this.experiment}/question`);
+                this.renderQuestion(data);
+                this.updateStats(data.stats);
+                this.answerInput.value = '';
+                this.setFeedback('');
+            } catch (error) {
+                console.error('Gagal mengambil soal quiz:', error);
+                this.setFeedback(error.message || 'Tidak dapat mengambil soal.', 'error');
+            } finally {
+                this.setLoading(false);
+            }
+        },
+        async submitAnswer() {
+            if (!this.isLoggedIn) {
+                this.setFeedback('Masuk untuk mengirim jawaban.', 'error');
+                return;
+            }
+            if (!this.currentQuestion) {
+                await this.fetchQuestion(true);
+                if (!this.currentQuestion) return;
+            }
+            const rawValue = this.answerInput.value.trim().replace(',', '.');
+            const numericValue = Number(rawValue);
+            if (!Number.isFinite(numericValue)) {
+                this.setFeedback('Masukkan jawaban numerik yang valid.', 'error');
+                return;
+            }
+            this.setLoading(true);
+            try {
+                const result = await apiRequest(`/quiz/${this.experiment}/answer`, {
+                    method: 'POST',
+                    body: {
+                        answer: numericValue,
+                        parameters: this.currentQuestion.parameters,
+                    },
+                });
+                const decimals = Number.isFinite(result.answerDecimalPlaces)
+                    ? result.answerDecimalPlaces
+                    : this.currentQuestion.answerDecimalPlaces || 2;
+                const expectedText = formatNumberLocale(result.expectedAnswer, decimals);
+                const unitLabel = this.currentQuestion.unit ? ` ${this.currentQuestion.unit}` : '';
+                if (result.correct) {
+                    this.setFeedback(`Benar! Jawaban yang diharapkan ${expectedText}${unitLabel}.`, 'success');
+                } else {
+                    const difference = Math.abs(numericValue - result.expectedAnswer);
+                    const diffText = formatNumberLocale(difference, Math.min(decimals + 1, 4));
+                    this.setFeedback(`Belum tepat. Selisih ${diffText}${unitLabel}. Jawaban seharusnya ${expectedText}${unitLabel}.`, 'error');
+                }
+                this.updateStats(result.stats);
+                if (result.nextQuestion) {
+                    this.renderQuestion(result.nextQuestion);
+                    this.answerInput.value = '';
+                }
+            } catch (error) {
+                console.error('Gagal mengirim jawaban quiz:', error);
+                this.setFeedback(error.message || 'Jawaban tidak dapat dinilai.', 'error');
+            } finally {
+                this.setLoading(false);
+            }
+        },
+        onAuthStateChange(loggedIn) {
+            this.isLoggedIn = Boolean(loggedIn);
+            if (!this.isLoggedIn) {
+                this.currentQuestion = null;
+                this.answerInput.value = '';
+                this.enableControls(false);
+                this.setPrompt('Masuk untuk memulai quiz dan gunakan simulasi untuk menjawab.');
+                this.setFeedback('');
+                this.updateStats({ attempts: 0, correct: 0, incorrect: 0 });
+                return;
+            }
+            this.enableControls(true);
+            if (!this.currentQuestion) {
+                this.fetchQuestion(true);
+            }
+        },
+    };
+
+    submitButton.addEventListener('click', () => module.submitAnswer());
+    refreshButton.addEventListener('click', () => module.fetchQuestion(true));
+    answerInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            module.submitAnswer();
+        }
+    });
+
+    registerQuizModule(module);
+    module.onAuthStateChange(Boolean(currentUser && authToken));
+    return module;
 }
 
 function initHeadlineRotator() {
@@ -888,6 +1118,16 @@ function initPendulum() {
     if (resetButton) resetButton.addEventListener('click', resetPendulumSimulation);
     if (clearDataButton) clearDataButton.addEventListener('click', clearPendulumData);
 
+    initQuizModule({
+        experiment: 'pendulum',
+        promptSelector: '#pendulumQuizPrompt',
+        answerSelector: '#pendulumQuizAnswer',
+        submitSelector: '#pendulumQuizSubmit',
+        refreshSelector: '#pendulumQuizRefresh',
+        feedbackSelector: '#pendulumQuizFeedback',
+        statsSelector: '#pendulumQuizStats',
+    });
+
     resetPendulumSimulation();
     if (animationFrameId) cancelAnimationFrame(animationFrameId);
     animationFrameId = requestAnimationFrame(animate);
@@ -1077,6 +1317,16 @@ function initFreeFall() {
     if (btnPause) btnPause.addEventListener('click', togglePause);
     if (btnReset) btnReset.addEventListener('click', reset);
 
+    initQuizModule({
+        experiment: 'freefall',
+        promptSelector: '#freefallQuizPrompt',
+        answerSelector: '#freefallQuizAnswer',
+        submitSelector: '#freefallQuizSubmit',
+        refreshSelector: '#freefallQuizRefresh',
+        feedbackSelector: '#freefallQuizFeedback',
+        statsSelector: '#freefallQuizStats',
+    });
+
     reset();
 }
 
@@ -1244,6 +1494,16 @@ function initProjectile() {
     });
 
     if (btnReset) btnReset.addEventListener('click', updateDisplay);
+
+    initQuizModule({
+        experiment: 'projectile',
+        promptSelector: '#projectileQuizPrompt',
+        answerSelector: '#projectileQuizAnswer',
+        submitSelector: '#projectileQuizSubmit',
+        refreshSelector: '#projectileQuizRefresh',
+        feedbackSelector: '#projectileQuizFeedback',
+        statsSelector: '#projectileQuizStats',
+    });
 
     updateDisplay();
 }

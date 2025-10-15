@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const { register, login, getMe, authMiddleware } = require('./controllers/authController');
 const { listProgress, saveProgress } = require('./controllers/progressController');
+const { getQuizQuestion, submitQuizAnswer, listQuizStats } = require('./controllers/quizController');
 const { PORT, CLIENT_ORIGIN } = require('./config/env');
 require('./config/database');
 
@@ -24,6 +25,9 @@ app.post('/api/login', login);
 app.get('/api/me', authMiddleware, getMe);
 app.get('/api/progress', authMiddleware, listProgress);
 app.post('/api/progress', authMiddleware, saveProgress);
+app.get('/api/quiz/:experiment/question', authMiddleware, getQuizQuestion);
+app.post('/api/quiz/:experiment/answer', authMiddleware, submitQuizAnswer);
+app.get('/api/quiz/stats', authMiddleware, listQuizStats);
 
 app.use((err, req, res, next) => {
     console.error('Unhandled error:', err);

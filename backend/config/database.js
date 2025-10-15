@@ -33,6 +33,17 @@ CREATE TABLE IF NOT EXISTS user_progress (
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(user_id, experiment)
 );
+
+CREATE TABLE IF NOT EXISTS user_quiz_stats (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    experiment TEXT NOT NULL,
+    attempts INTEGER NOT NULL DEFAULT 0,
+    correct_count INTEGER NOT NULL DEFAULT 0,
+    incorrect_count INTEGER NOT NULL DEFAULT 0,
+    last_attempt_at TIMESTAMPTZ,
+    UNIQUE(user_id, experiment)
+);
 `;
 
 (async () => {

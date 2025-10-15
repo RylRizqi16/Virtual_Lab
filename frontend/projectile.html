@@ -71,6 +71,24 @@
                     </ul>
                 </div>
 
+                <section class="quiz-card" id="projectileQuiz" aria-live="polite">
+                    <h3>Quiz Gerak Parabola</h3>
+                    <p id="projectileQuizPrompt">Masuk untuk memulai quiz dan gunakan hasil simulasi meriam untuk menebak jawabannya.</p>
+                    <div class="quiz-input">
+                        <label for="projectileQuizAnswer">Jawaban Anda (meter)</label>
+                        <input type="number" id="projectileQuizAnswer" step="0.1" min="0" placeholder="0.00" disabled>
+                    </div>
+                    <div class="quiz-actions">
+                        <button id="projectileQuizSubmit" class="action-button primary" type="button" disabled>Kirim Jawaban</button>
+                        <button id="projectileQuizRefresh" class="action-button secondary" type="button" disabled>Soal Baru</button>
+                    </div>
+                    <p id="projectileQuizFeedback" class="quiz-feedback" role="status"></p>
+                    <div id="projectileQuizStats" class="quiz-stats">
+                        <span>Upaya: <strong data-quiz-attr="attempts">0</strong></span>
+                        <span>Benar: <strong data-quiz-attr="correct">0</strong> • Salah: <strong data-quiz-attr="incorrect">0</strong></span>
+                    </div>
+                </section>
+
                 <h2>Kontrol</h2>
                 <div class="control-group">
                     <label for="projSpeed">Kecepatan Awal (v₀):</label>

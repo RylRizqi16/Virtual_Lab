@@ -76,6 +76,24 @@
                     </ul>
                 </div>
 
+                <section class="quiz-card" id="pendulumQuiz" aria-live="polite">
+                    <h3>Quiz Bandul</h3>
+                    <p id="pendulumQuizPrompt">Masuk untuk memulai quiz dan gunakan simulasi untuk menghitung jawabannya.</p>
+                    <div class="quiz-input">
+                        <label for="pendulumQuizAnswer">Jawaban Anda (detik)</label>
+                        <input type="number" id="pendulumQuizAnswer" step="0.01" min="0" placeholder="0.00" disabled>
+                    </div>
+                    <div class="quiz-actions">
+                        <button id="pendulumQuizSubmit" class="action-button primary" type="button" disabled>Kirim Jawaban</button>
+                        <button id="pendulumQuizRefresh" class="action-button secondary" type="button" disabled>Soal Baru</button>
+                    </div>
+                    <p id="pendulumQuizFeedback" class="quiz-feedback" role="status"></p>
+                    <div id="pendulumQuizStats" class="quiz-stats">
+                        <span>Upaya: <strong data-quiz-attr="attempts">0</strong></span>
+                        <span>Benar: <strong data-quiz-attr="correct">0</strong> • Salah: <strong data-quiz-attr="incorrect">0</strong></span>
+                    </div>
+                </section>
+
                 <h2>Kontrol Eksperimen</h2>
 
                 <div class="control-group">

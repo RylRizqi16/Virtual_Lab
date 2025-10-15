@@ -71,6 +71,24 @@
                     </ul>
                 </div>
 
+                <section class="quiz-card" id="freefallQuiz" aria-live="polite">
+                    <h3>Quiz Jatuh Bebas</h3>
+                    <p id="freefallQuizPrompt">Masuk untuk mendapatkan soal acak dan uji perhitungan Anda dengan simulasi.</p>
+                    <div class="quiz-input">
+                        <label for="freefallQuizAnswer">Jawaban Anda (detik)</label>
+                        <input type="number" id="freefallQuizAnswer" step="0.01" min="0" placeholder="0.00" disabled>
+                    </div>
+                    <div class="quiz-actions">
+                        <button id="freefallQuizSubmit" class="action-button primary" type="button" disabled>Kirim Jawaban</button>
+                        <button id="freefallQuizRefresh" class="action-button secondary" type="button" disabled>Soal Baru</button>
+                    </div>
+                    <p id="freefallQuizFeedback" class="quiz-feedback" role="status"></p>
+                    <div id="freefallQuizStats" class="quiz-stats">
+                        <span>Upaya: <strong data-quiz-attr="attempts">0</strong></span>
+                        <span>Benar: <strong data-quiz-attr="correct">0</strong> • Salah: <strong data-quiz-attr="incorrect">0</strong></span>
+                    </div>
+                </section>
+
                 <h2>Kontrol</h2>
                 <div class="control-group">
                     <label for="ffHeight">Ketinggian Awal (h):</label>
