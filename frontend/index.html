@@ -27,19 +27,12 @@
                     <span class="badge accent hero-kicker">Virtual Lab Fisika</span>
                     <h1 class="hero-title" aria-live="polite">
                         <span class="headline-line is-active">Eksperimen Fisika Tanpa Batas</span>
-                        <span class="headline-line">Bangun laporan otomatis dengan insight real-time</span>
-                        <span class="headline-line">Kolaborasi lintas perangkat tanpa kehilangan progres</span>
+                        <span class="headline-line">Satu dasbor untuk bandul, jatuh bebas, dan parabola</span>
                     </h1>
-                    <p class="hero-subtitle">Visualisasikan konsep mekanika dasar, simpan hasil, dan bagikan progres eksperimen Anda secara terpadu di platform yang dirancang untuk praktikum modern.</p>
-                    <div class="hero-highlight-band" role="list">
-                        <span class="highlight-chip" role="listitem">Kontrol identik di semua simulasi</span>
-                        <span class="highlight-chip" role="listitem">Pencatatan otomatis siap laporan</span>
-                        <span class="highlight-chip" role="listitem">Integrasi Neon PostgreSQL</span>
-                    </div>
+                    <p class="hero-subtitle">Jalankan eksperimen mekanika klasik, catat hasil penting, dan kelola progres Anda dalam satu tempat yang rapi.</p>
                     <div class="hero-actions">
                         <a href="pendulum.html" class="action-button primary">Mulai Eksperimen</a>
                         <button id="authCtaButton" class="action-button secondary" type="button">Masuk / Daftar</button>
-                        <a href="#experience-showcase" class="action-button outline">Lihat katalog simulasi</a>
                     </div>
                     <ul class="hero-metrics" id="heroMetrics">
                         <li><span id="metricUsers" data-countup="1275">1.275</span> Mahasiswa aktif</li>
@@ -48,29 +41,9 @@
                     </ul>
                 </div>
                 <aside class="hero-aside" aria-label="Sorotan aktivitas">
-                    <article class="hero-panel">
-                        <header class="panel-header">
-                            <div class="icon-circle" aria-hidden="true">◎</div>
-                            <div>
-                                <h3>Live Experiment Feed</h3>
-                                <p>Catatan terkini dari pengguna Virtual Lab</p>
-                            </div>
-                        </header>
-                        <ul class="hero-feed" id="heroFeed">
-                            <li><span class="feed-dot"></span><strong>Bandul</strong> • g = 9,78 m/s²</li>
-                            <li><span class="feed-dot"></span><strong>Jatuh Bebas</strong> • h = 35 m tersimpan</li>
-                            <li><span class="feed-dot"></span><strong>Meriam</strong> • Sudut optimal 43°</li>
-                        </ul>
-                        <button class="ghost-button" type="button" id="refreshHeroFeed">Segarkan feed</button>
-                    </article>
-                    <article class="hero-panel">
-                        <header class="panel-header">
-                            <div class="icon-circle" aria-hidden="true">✓</div>
-                            <div>
-                                <h3>Ringkasan Progres</h3>
-                                <p id="progressSummary">Belum ada data tersimpan.</p>
-                            </div>
-                        </header>
+                    <article class="hero-panel compact-panel">
+                        <h3>Ringkasan Progres</h3>
+                        <p id="progressSummary">Belum ada data tersimpan.</p>
                         <ul class="progress-list" id="progressOverviewList">
                             <li>Masuk untuk menyimpan eksperimen favorit Anda.</li>
                         </ul>
@@ -79,15 +52,23 @@
                             <button class="action-button outline" type="button" data-open-auth="progress">Sinkronkan Progres</button>
                         </div>
                     </article>
+                    <article class="hero-panel compact-panel">
+                        <h3>Aktivitas Terbaru</h3>
+                        <ul class="hero-feed" id="heroFeed">
+                            <li><span class="feed-dot"></span><strong>Bandul</strong> • g = 9,78 m/s²</li>
+                            <li><span class="feed-dot"></span><strong>Jatuh Bebas</strong> • h = 35 m tersimpan</li>
+                            <li><span class="feed-dot"></span><strong>Meriam</strong> • Sudut optimal 43°</li>
+                        </ul>
+                    </article>
                     <p id="authStatusMessage" class="auth-status-note">Masuk untuk melihat eksperimen terbaru kapan saja.</p>
                 </aside>
             </div>
         </header>
 
         <section class="insight-grid" id="experience-showcase">
-            <header class="section-header">
-                <h2>Katalog Simulasi dan Insight</h2>
-                <p>Setiap modul dilengkapi data overlay, panel insight, dan integrasi penyimpanan progres yang seragam.</p>
+            <header class="section-header align-left">
+                <h2>Pilihan Simulasi</h2>
+                <p>Setiap modul menyediakan kontrol identik dan catatan otomatis, jadi Anda bisa fokus pada analisis.</p>
             </header>
             <div class="insight-grid-wrapper">
                 <article class="insight-card">
@@ -95,40 +76,29 @@
                         <span class="badge">Bandul</span>
                         <h3>Resonansi &amp; Periode</h3>
                     </header>
-                    <p>Eksplorasi hubungan antara panjang tali dan gravitasi dengan pelacakan periode 10 osilasi otomatis.</p>
+                    <p>Hitung percepatan gravitasi dari periode rata-rata dalam 10 ayunan.</p>
                     <a href="pendulum.html" class="text-link">Buka simulasi →</a>
                 </article>
                 <article class="insight-card">
                     <header>
                         <span class="badge">Jatuh Bebas</span>
-                        <h3>Dari Menara ke Rumus</h3>
+                        <h3>GLBB Ideal</h3>
                     </header>
-                    <p>Simulasikan GLBB tanpa hambatan dan hentikan objek pada titik mana pun untuk analisis waktu-jarak.</p>
+                    <p>Observasi hubungan ketinggian, waktu jatuh, dan kecepatan akhir tanpa hambatan udara.</p>
                     <a href="freefall.html" class="text-link">Buka simulasi →</a>
                 </article>
                 <article class="insight-card">
                     <header>
                         <span class="badge">Gerak Parabola</span>
-                        <h3>Optimasi Sudut</h3>
+                        <h3>Sudut Optimal</h3>
                     </header>
-                    <p>Uji variasi kecepatan awal dan sudut tembak demi menemukan jangkauan maksimum dan tinggi puncak.</p>
+                    <p>Temukan kombinasi sudut dan kecepatan awal untuk jangkauan maksimum secara visual.</p>
                     <a href="projectile.html" class="text-link">Buka simulasi →</a>
-                </article>
-                <article class="insight-card highlight">
-                    <header>
-                        <span class="badge accent">Kenapa Virtual Lab?</span>
-                        <h3>Analitik Tanpa Gesekan</h3>
-                    </header>
-                    <ul class="feature-list">
-                        <li>Autentikasi aman dengan token terenkripsi.</li>
-                        <li>Sinkronisasi progres ke Neon PostgreSQL.</li>
-                        <li>Kartu ringkas siap tempel ke laporan praktikum.</li>
-                    </ul>
                 </article>
                 <article class="insight-card progress-snapshot">
                     <header>
-                        <span class="badge">Tracker Progres</span>
-                        <h3>Ringkasan Cepat</h3>
+                        <span class="badge">Snapshot</span>
+                        <h3>Progres Terbaru</h3>
                     </header>
                     <p id="progressMiniCopy">Masuk untuk mulai menyimpan eksperimen dan dapatkan rekap otomatis.</p>
                     <ul class="bullet-list" id="progressMiniList">
@@ -137,82 +107,6 @@
                     </ul>
                     <button class="text-link" type="button" data-open-auth="progress">Sinkronkan data →</button>
                 </article>
-            </div>
-        </section>
-
-        <section class="journey" id="journey">
-            <div class="journey-content">
-                <header class="section-header align-left">
-                    <h2>Langkah Eksperimen Konsisten</h2>
-                    <p>Pilih kartu untuk melihat detail tiap fase praktikum digital Anda.</p>
-                </header>
-                <div class="journey-steps" role="tablist">
-                    <button class="journey-step is-active" type="button" role="tab" data-step="0">1. Pilih Simulasi</button>
-                    <button class="journey-step" type="button" role="tab" data-step="1">2. Atur Parameter</button>
-                    <button class="journey-step" type="button" role="tab" data-step="2">3. Jalankan &amp; Catat</button>
-                    <button class="journey-step" type="button" role="tab" data-step="3">4. Sinkronisasi</button>
-                </div>
-                <div class="journey-detail" id="journeyDetail">
-                    <h3>Pilih Simulasi</h3>
-                    <p>Mulai dari landing page atau panel navigasi di bagian atas untuk melompat ke eksperimen favorit Anda.</p>
-                </div>
-            </div>
-            <aside class="journey-aside">
-                <h3>Statistik Real-time</h3>
-                <div class="journey-stats">
-                    <div class="stat-card">
-                        <span class="stat-value" id="liveStatExperiments">1.204</span>
-                        <span class="stat-label">Eksperimen tersimpan</span>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-value" id="liveStatSync">312</span>
-                        <span class="stat-label">Sinkron 24 jam terakhir</span>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-value" id="liveStatActive">118</span>
-                        <span class="stat-label">Pengguna aktif saat ini</span>
-                    </div>
-                </div>
-                <blockquote class="testimonial">
-                    “Interface yang konsisten membuat kami bisa fokus pada analisis data, bukan sekadar menata ulang parameter.”
-                    <cite>— Rizqi, Asisten Praktikum</cite>
-                </blockquote>
-            </aside>
-        </section>
-
-        <section class="cta-panel">
-            <div class="cta-content">
-                <h2>Mulai praktikum digital dengan percaya diri</h2>
-                <p>Satu akun untuk mengakses bandul, jatuh bebas, dan gerak parabola lengkap dengan rekap otomatis.</p>
-            </div>
-            <div class="cta-actions">
-                <button class="action-button primary" type="button" id="landingPrimaryCta" data-open-auth="cta">Masuk Sekarang</button>
-                <a href="projectile.html" class="action-button outline">Lompat ke simulasi terbaru</a>
-            </div>
-        </section>
-
-        <section class="faq-section" id="faq">
-            <header class="section-header">
-                <h2>Pertanyaan Umum</h2>
-                <p>Jawaban ringkas agar Anda memahami alur platform sebelum mulai bereksperimen.</p>
-            </header>
-            <div class="faq-list">
-                <details class="faq-item">
-                    <summary>Apakah saya perlu instal software tambahan?</summary>
-                    <p>Tidak. Seluruh simulasi berjalan di browser modern dan dioptimalkan untuk perangkat layar lebar maupun tablet.</p>
-                </details>
-                <details class="faq-item">
-                    <summary>Bagaimana cara menyimpan progres eksperimen?</summary>
-                    <p>Masuk dengan akun Anda, jalankan eksperimen, dan progres tersinkron otomatis ke Neon PostgreSQL.</p>
-                </details>
-                <details class="faq-item">
-                    <summary>Bisakah saya mengunduh data hasil simulasi?</summary>
-                    <p>Ya, setiap modul menyediakan rekap tabel yang dapat diekspor atau dicatat langsung ke laporan.</p>
-                </details>
-                <details class="faq-item">
-                    <summary>Apakah progres saya sinkron antar perangkat?</summary>
-                    <p>Selama Anda masuk, progres akan tersedia di semua perangkat sehingga Anda bisa melanjutkan kapan saja.</p>
-                </details>
             </div>
         </section>
     </main>

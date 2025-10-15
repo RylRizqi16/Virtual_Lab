@@ -30,6 +30,8 @@ const authElements = {
     authToggleText: null,
     authToggleButton: null,
     savedPendulumSummary: null,
+    savedFreefallSummary: null,
+    savedProjectileSummary: null,
     syncNowButton: null,
 };
 
@@ -167,6 +169,8 @@ function renderProgressUI() {
         progressMiniCount,
         progressMiniLast,
         savedPendulumSummary,
+        savedFreefallSummary,
+        savedProjectileSummary,
     } = authElements;
 
     const records = Array.isArray(cachedProgress) ? cachedProgress.slice() : [];
@@ -251,6 +255,20 @@ function renderProgressUI() {
         savedPendulumSummary.textContent = pendulumData
             ? createProgressSummary(pendulumData)
             : 'Belum ada progres bandul tersimpan. Jalankan eksperimen untuk merekam hasil.';
+    }
+
+    if (savedFreefallSummary) {
+        const freefallData = sortedRecords.find((item) => item.experiment === 'freefall');
+        savedFreefallSummary.textContent = freefallData
+            ? createProgressSummary(freefallData)
+            : 'Belum ada progres jatuh bebas tersimpan. Jalankan simulasi untuk merekam data.';
+    }
+
+    if (savedProjectileSummary) {
+        const projectileData = sortedRecords.find((item) => item.experiment === 'projectile');
+        savedProjectileSummary.textContent = projectileData
+            ? createProgressSummary(projectileData)
+            : 'Belum ada progres gerak parabola tersimpan. Jalankan simulasi untuk mencatat hasil.';
     }
 }
 
@@ -462,13 +480,29 @@ function initLandingPageEnhancements() {
 
 function createProgressSummary(item) {
     if (!item || !item.payload) return '-';
+    const formatValue = (value, fractionDigits) => {
+        const num = Number(value);
+        return Number.isFinite(num) ? num.toFixed(fractionDigits) : '--';
+    };
     try {
         const data = typeof item.payload === 'string' ? JSON.parse(item.payload) : item.payload;
         if (item.experiment === 'pendulum' && data) {
-            const length = Number(data.L).toFixed(2);
-            const period = Number(data.T).toFixed(3);
-            const gravity = Number(data.g).toFixed(3);
+            const length = formatValue(data.L, 2);
+            const period = formatValue(data.T, 3);
+            const gravity = formatValue(data.g, 3);
             return `L=${length} m, T=${period} s, g=${gravity} m/s²`;
+        }
+        if (item.experiment === 'freefall' && data) {
+            const height = formatValue(data.height ?? data.h, 1);
+            const time = formatValue(data.timeOfFlight ?? data.time, 2);
+            const impact = formatValue(data.impactVelocity ?? data.velocity, 2);
+            return `h=${height} m, t=${time} s, v=${impact} m/s`;
+        }
+        if (item.experiment === 'projectile' && data) {
+            const speed = formatValue(data.speed ?? data.v0, 1);
+            const angle = formatValue(data.angle ?? data.theta, 0);
+            const range = formatValue(data.range ?? data.distance, 2);
+            return `v₀=${speed} m/s, θ=${angle}°, jangkauan=${range} m`;
         }
         if (data.summary) return data.summary;
         return JSON.stringify(data);
@@ -601,6 +635,8 @@ function initAuth() {
     authElements.authToggleText = $('#authToggleText');
     authElements.authToggleButton = $('#authToggleButton');
     authElements.savedPendulumSummary = $('#savedPendulumSummary');
+    authElements.savedFreefallSummary = $('#savedFreefallSummary');
+    authElements.savedProjectileSummary = $('#savedProjectileSummary');
     authElements.syncNowButton = $('#syncNowButton');
 
     const closeAuthModalBtn = $('#closeAuthModal');
@@ -887,6 +923,7 @@ function initFreeFall() {
     const maxDisplayHeight = parseFloat(hSlider?.max ?? 100);
     const topMargin = 60;
     const groundMargin = 60;
+    let activeRun = null;
 
     function updatePauseButton() {
         if (!btnPause) return;
@@ -948,6 +985,22 @@ function initFreeFall() {
         elapsed += dt;
 
         if (y <= 0) {
+            const runSnapshot = activeRun;
+            const baselineHeight = runSnapshot ? runSnapshot.height : height;
+            const baselineGravity = runSnapshot ? runSnapshot.gravity : gravity;
+            const massValue = runSnapshot ? runSnapshot.mass : parseFloat(mSlider?.value ?? 1);
+            if (runSnapshot) {
+                const impactVelocity = Math.sqrt(Math.max(0, 2 * baselineGravity * baselineHeight));
+                recordProgress('freefall', {
+                    height: baselineHeight,
+                    mass: Number.isFinite(massValue) ? massValue : 1,
+                    gravity: baselineGravity,
+                    timeOfFlight: elapsed,
+                    impactVelocity,
+                    capturedAt: new Date().toISOString(),
+                });
+                activeRun = null;
+            }
             y = 0;
             velocity = 0;
             running = false;
@@ -976,6 +1029,7 @@ function initFreeFall() {
         running = false;
         paused = false;
         lastTimestamp = 0;
+        activeRun = null;
         if (animationFrameId !== null) {
             cancelAnimationFrame(animationFrameId);
             animationFrameId = null;
@@ -1000,17 +1054,25 @@ function initFreeFall() {
     });
     if (gSlider) gSlider.addEventListener('input', reset);
     if (btnStart) btnStart.addEventListener('click', () => {
-        if (!running) {
-            if (y <= 0) reset();
-            running = true;
-            paused = false;
-            updatePauseButton();
-            lastTimestamp = 0;
-            if (animationFrameId !== null) {
-                cancelAnimationFrame(animationFrameId);
-            }
-            animationFrameId = requestAnimationFrame(step);
+        if (running) return;
+        reset();
+        height = parseFloat(hSlider?.value ?? height);
+        gravity = parseFloat(gSlider?.value ?? gravity);
+        const massValue = parseFloat(mSlider?.value ?? 1);
+        activeRun = {
+            height,
+            mass: Number.isFinite(massValue) ? massValue : 1,
+            gravity,
+            startedAt: new Date().toISOString(),
+        };
+        running = true;
+        paused = false;
+        updatePauseButton();
+        lastTimestamp = 0;
+        if (animationFrameId !== null) {
+            cancelAnimationFrame(animationFrameId);
         }
+        animationFrameId = requestAnimationFrame(step);
     });
     if (btnPause) btnPause.addEventListener('click', togglePause);
     if (btnReset) btnReset.addEventListener('click', reset);
@@ -1042,6 +1104,7 @@ function initProjectile() {
     let lastTimestamp = 0;
     let elapsed = 0;
     let trail = [];
+    let activeRun = null;
 
     function calculateDerivedValues() {
         const angleRad = degToRad(angle);
@@ -1111,8 +1174,22 @@ function initProjectile() {
         const y = vy * elapsed - 0.5 * gravity * elapsed * elapsed;
 
         if (y <= 0 && elapsed > 0) {
-            trail.push({ x: vx * elapsed, y: 0 });
-            drawProjectile(vx * elapsed, 0);
+            const landingX = vx * elapsed;
+            trail.push({ x: landingX, y: 0 });
+            drawProjectile(landingX, 0);
+            if (activeRun) {
+                recordProgress('projectile', {
+                    speed: activeRun.speed,
+                    angle: activeRun.angle,
+                    gravity: activeRun.gravity,
+                    timeOfFlight: elapsed,
+                    range: landingX,
+                    maxHeight: activeRun.expectedHmax,
+                    expectedRange: activeRun.expectedRange,
+                    capturedAt: new Date().toISOString(),
+                });
+                activeRun = null;
+            }
             running = false;
             return;
         }
@@ -1130,6 +1207,7 @@ function initProjectile() {
         trail = [];
         running = false;
         lastTimestamp = 0;
+        activeRun = null;
         drawProjectile(0, 0);
     }
 
@@ -1148,6 +1226,16 @@ function initProjectile() {
 
     if (btnStart) btnStart.addEventListener('click', () => {
         if (running) return;
+        const derived = calculateDerivedValues();
+        activeRun = {
+            speed,
+            angle,
+            gravity,
+            expectedRange: derived.expectedRange,
+            expectedHmax: derived.expectedHmax,
+            expectedFlightTime: derived.tFlight,
+            startedAt: new Date().toISOString(),
+        };
         elapsed = 0;
         trail = [];
         running = true;
