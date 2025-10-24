@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Pengguna • SimuLab</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body data-profile-page="true">
+    <nav class="top-nav">
+        <a class="brand" href="index.html" title="Beranda SimuLab">
+            <span class="logo-dot"></span>
+            <span>SimuLab</span>
+        </a>
+        <ul class="nav-links">
+            <li><a class="link" href="index.html">Beranda</a></li>
+            <li><a class="link" href="pendulum.html">Bandul</a></li>
+            <li><a class="link" href="freefall.html">Jatuh Bebas</a></li>
+            <li><a class="link" href="projectile.html">Meriam</a></li>
+            <li><a class="link" href="profile.html">Profil</a></li>
+            <li><span id="userDisplay" class="user-badge is-hidden" aria-live="polite"></span></li>
+            <li><button id="authButton" class="link outline" type="button">Masuk</button></li>
+            <li><button id="logoutButton" class="link outline hidden" type="button">Keluar</button></li>
+        </ul>
+    </nav>
+
+    <main class="view-container">
+        <section id="profilePage" class="profile-page">
+            <header class="profile-header">
+                <div class="profile-info">
+                    <span class="badge accent">Profil</span>
+                    <h1 id="profileNameDisplay">Profil SimuLab</h1>
+                    <p id="profileEmail" class="profile-email">-</p>
+                    <p id="profileJoined" class="profile-meta">Bergabung: -</p>
+                </div>
+                <div class="profile-status" id="profileStatus"></div>
+            </header>
+
+            <div id="profileGuestNotice" class="profile-card notice">
+                <h2>Masuk untuk Melihat Profil</h2>
+                <p>Halaman ini menampilkan data akun SimuLab Anda, riwayat simulasi, dan statistik quiz. Silakan masuk untuk mengelola profil.</p>
+                <button id="profileLoginButton" class="action-button primary" type="button">Masuk ke SimuLab</button>
+            </div>
+
+            <div id="profileLoading" class="profile-card notice hidden">
+                <p>Sedang memuat data profil...</p>
+            </div>
+
+            <section id="profileContent" class="profile-content hidden">
+                <div class="profile-grid">
+                    <article id="profileEditSection" class="profile-card">
+                        <header>
+                            <h2>Data Akun</h2>
+                            <p>Perbarui informasi dasar agar profil Anda tampil lebih personal.</p>
+                        </header>
+                        <form id="profileForm" class="profile-form">
+                            <label for="profileFullName">Nama Lengkap</label>
+                            <input type="text" id="profileFullName" name="fullName" maxlength="120" placeholder="Nama Anda">
+
+                            <label for="profileInstitution">Institusi / Kelas</label>
+                            <input type="text" id="profileInstitution" name="institution" maxlength="120" placeholder="Contoh: TPB ITB 2025">
+
+                            <label for="profileBio">Bio Singkat</label>
+                            <textarea id="profileBio" name="bio" rows="4" maxlength="600" placeholder="Ceritakan fokus eksperimen atau minat riset Anda."></textarea>
+
+                            <div class="profile-form-actions">
+                                <button type="submit" class="action-button primary">Simpan Perubahan</button>
+                                <button type="reset" id="profileResetButton" class="action-button secondary">Batalkan</button>
+                            </div>
+                        </form>
+                    </article>
+
+                    <article class="profile-card">
+                        <header>
+                            <h2>Snapshot Simulasi</h2>
+                            <p>Ringkasan progres terbaru yang tersinkron.</p>
+                        </header>
+                        <ul id="profileProgressList" class="profile-list">
+                            <li>Tidak ada progres tersimpan.</li>
+                        </ul>
+                    </article>
+
+                    <article class="profile-card">
+                        <header>
+                            <h2>Statistik Quiz</h2>
+                            <p>Pantau performa Anda di setiap modul.</p>
+                        </header>
+                        <ul id="profileQuizStats" class="profile-list">
+                            <li>Belum ada aktivitas quiz.</li>
+                        </ul>
+                    </article>
+                </div>
+
+                <section class="profile-grid">
+                    <article class="profile-card wide">
+                        <header>
+                            <h2>Riwayat Simulasi</h2>
+                            <p>Percobaan yang tersimpan secara kronologis.</p>
+                        </header>
+                        <ul id="profileSimulationHistory" class="profile-timeline">
+                            <li>Tidak ada riwayat simulasi.</li>
+                        </ul>
+                    </article>
+
+                    <article class="profile-card wide">
+                        <header>
+                            <h2>Riwayat Quiz</h2>
+                            <p>Catatan percobaan menjawab soal beserta statusnya.</p>
+                        </header>
+                        <ul id="profileQuizHistory" class="profile-timeline">
+                            <li>Tidak ada riwayat quiz.</li>
+                        </ul>
+                    </article>
+                </section>
+            </section>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <p>© 2025 SimuLab</p>
+    </footer>
+
+    <script src="script.js" defer></script>
+</body>
+</html>

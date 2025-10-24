@@ -24,6 +24,11 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
+ALTER TABLE users
+    ADD COLUMN IF NOT EXISTS full_name TEXT,
+    ADD COLUMN IF NOT EXISTS institution TEXT,
+    ADD COLUMN IF NOT EXISTS bio TEXT;
+
 CREATE TABLE IF NOT EXISTS user_progress (
     id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -44,6 +49,18 @@ CREATE TABLE IF NOT EXISTS user_quiz_stats (
     last_attempt_at TIMESTAMPTZ,
     UNIQUE(user_id, experiment)
 );
+
+CREATE TABLE IF NOT EXISTS user_activity_logs (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    activity_type TEXT NOT NULL,
+    experiment TEXT,
+    metadata JSONB,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_user_activity_logs_user_created
+    ON user_activity_logs (user_id, created_at);
 `;
 
 (async () => {

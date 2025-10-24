@@ -32,6 +32,27 @@ async function saveProgress(req, res) {
 
     try {
         await db.query(sql, [userId, experiment, payloadString]);
+        try {
+            let parsedPayload = null;
+            try {
+                parsedPayload = JSON.parse(payloadString);
+            } catch (parseError) {
+                if (payload && typeof payload === 'object') {
+                    parsedPayload = payload;
+                }
+            }
+            const metadata = {
+                experiment,
+                payload: parsedPayload,
+                savedAt: new Date().toISOString(),
+            };
+            await db.query(
+                'INSERT INTO user_activity_logs (user_id, activity_type, experiment, metadata) VALUES ($1, $2, $3, $4::jsonb)',
+                [userId, 'simulation_progress', experiment, JSON.stringify(metadata)]
+            );
+        } catch (logError) {
+            console.warn('Gagal mencatat log aktivitas progres:', logError.message);
+        }
         return res.status(201).json({ message: 'Progres tersimpan.' });
     } catch (error) {
         console.error('Kesalahan saat menyimpan progres:', error);

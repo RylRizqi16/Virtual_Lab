@@ -41,7 +41,7 @@ async function login(req, res) {
     }
 
     try {
-        const result = await db.query('SELECT id, email, password_hash FROM users WHERE email = $1', [email]);
+        const result = await db.query('SELECT id, email, password_hash, full_name, institution, bio FROM users WHERE email = $1', [email]);
         const user = result.rows[0];
         if (!user) {
             return res.status(401).json({ message: 'Email atau kata sandi salah.' });
@@ -53,7 +53,16 @@ async function login(req, res) {
         }
 
         const token = generateToken(user);
-        return res.json({ token, user: { id: user.id, email: user.email } });
+        return res.json({
+            token,
+            user: {
+                id: user.id,
+                email: user.email,
+                full_name: user.full_name,
+                institution: user.institution,
+                bio: user.bio,
+            },
+        });
     } catch (error) {
         console.error('Kesalahan saat login pengguna:', error);
         return res.status(500).json({ message: 'Terjadi kesalahan pada server.' });
@@ -63,7 +72,10 @@ async function login(req, res) {
 async function getMe(req, res) {
     const userId = req.user.id;
     try {
-        const result = await db.query('SELECT id, email, created_at FROM users WHERE id = $1', [userId]);
+        const result = await db.query(
+            'SELECT id, email, full_name, institution, bio, created_at FROM users WHERE id = $1',
+            [userId]
+        );
         const user = result.rows[0];
         if (!user) {
             return res.status(404).json({ message: 'Pengguna tidak ditemukan.' });

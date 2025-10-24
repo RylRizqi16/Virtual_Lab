@@ -11,6 +11,7 @@ SimuLab/
 │   ├── pendulum.html
 │   ├── freefall.html
 │   ├── projectile.html
+│   ├── profile.html
 │   ├── style.css
 │   ├── script.js
 │   └── assets/
@@ -34,6 +35,7 @@ SimuLab/
 - **UI Multi-Halaman**: landing page terpisah dari masing-masing simulasi (Bandul, Jatuh Bebas, Gerak Parabola).
 - **Sinkronisasi Cloud**: hasil eksperimen bandul otomatis dikirim ke backend saat pengukuran selesai.
 - **Single Sign-On Opsional**: login cukup sekali di landing page SimuLab untuk sinkronisasi lintas modul, sementara tamu tetap bisa langsung menjalankan simulasi.
+- **Halaman Profil**: menyajikan data akun, riwayat simulasi, statistik quiz, serta form pembaruan biodata pengguna.
 
 ## Menjalankan Secara Lokal
 

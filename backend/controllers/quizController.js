@@ -168,6 +168,24 @@ async function submitQuizAnswer(req, res) {
             [req.user.id, experiment, correctDelta, incorrectDelta]
         );
 
+        try {
+            const metadata = {
+                answer: numericAnswer,
+                expected,
+                correct: isCorrect,
+                tolerance,
+                decimals: config.answerDecimalPlaces,
+                parameters,
+                recordedAt: new Date().toISOString(),
+            };
+            await db.query(
+                'INSERT INTO user_activity_logs (user_id, activity_type, experiment, metadata) VALUES ($1, $2, $3, $4::jsonb)',
+                [req.user.id, 'quiz_attempt', experiment, JSON.stringify(metadata)]
+            );
+        } catch (logError) {
+            console.warn('Gagal mencatat log aktivitas quiz:', logError.message);
+        }
+
         const nextQuestion = config.generateQuestion();
         return res.json({
             correct: isCorrect,

@@ -27,10 +27,17 @@ if (!authToken) {
 let currentUser = null;
 let cachedProgress = [];
 const quizModules = [];
+const authSubscribers = [];
 
 function registerQuizModule(module) {
     if (module && typeof module.onAuthStateChange === 'function') {
         quizModules.push(module);
+    }
+}
+
+function registerAuthSubscriber(listener) {
+    if (typeof listener === 'function') {
+        authSubscribers.push(listener);
     }
 }
 
@@ -52,6 +59,23 @@ function decimalStep(decimals) {
 function decimalPlaceholder(decimals) {
     if (!Number.isFinite(decimals) || decimals <= 0) return '0';
     return `0.${'0'.repeat(decimals)}`;
+}
+
+function parseJsonSafe(value, fallback = null) {
+    if (!value) return fallback;
+    if (typeof value === 'object') return value;
+    try {
+        return JSON.parse(value);
+    } catch (error) {
+        return fallback;
+    }
+}
+
+function formatDateTime(value) {
+    if (!value) return '-';
+    const date = value instanceof Date ? value : new Date(value);
+    if (!Number.isFinite(date.getTime())) return '-';
+    return date.toLocaleString('id-ID');
 }
 
 const authElements = {
@@ -256,6 +280,13 @@ function updateAuthUI() {
             module.onAuthStateChange(isLoggedIn);
         } catch (error) {
             console.error('Gagal memperbarui modul quiz:', error);
+        }
+    });
+    authSubscribers.forEach((listener) => {
+        try {
+            listener(isLoggedIn, currentUser);
+        } catch (error) {
+            console.error('Gagal memperbarui subscriber auth:', error);
         }
     });
 }
@@ -1594,12 +1625,328 @@ function initProjectile() {
     updateDisplay();
 }
 
+function initProfilePage() {
+    const profileRoot = $('#profilePage');
+    if (!profileRoot) return;
+
+    const contentSection = $('#profileContent');
+    const guestNotice = $('#profileGuestNotice');
+    const loadingCard = $('#profileLoading');
+    const statusEl = $('#profileStatus');
+    const nameDisplay = $('#profileNameDisplay');
+    const emailDisplay = $('#profileEmail');
+    const joinedDisplay = $('#profileJoined');
+    const loginButton = $('#profileLoginButton');
+    const form = $('#profileForm');
+    const fullNameInput = $('#profileFullName');
+    const institutionInput = $('#profileInstitution');
+    const bioInput = $('#profileBio');
+    const resetButton = $('#profileResetButton');
+    const progressList = $('#profileProgressList');
+    const quizStatsList = $('#profileQuizStats');
+    const simulationHistoryList = $('#profileSimulationHistory');
+    const quizHistoryList = $('#profileQuizHistory');
+
+    let profileSnapshot = null;
+    let statusTimeout = null;
+    let isLoading = false;
+
+    function clearStatus() {
+        if (!statusEl) return;
+        statusEl.textContent = '';
+        statusEl.classList.remove('success', 'error');
+    }
+
+    function setStatus(message, type, duration = 4000) {
+        if (!statusEl) return;
+        if (statusTimeout) {
+            clearTimeout(statusTimeout);
+            statusTimeout = null;
+        }
+        statusEl.textContent = message || '';
+        statusEl.classList.remove('success', 'error');
+        if (type) {
+            statusEl.classList.add(type);
+        }
+        if (message && duration > 0) {
+            statusTimeout = window.setTimeout(() => {
+                clearStatus();
+            }, duration);
+        }
+    }
+
+    function setFormDisabled(disabled) {
+        if (!form) return;
+        form.querySelectorAll('input, textarea, button').forEach((element) => {
+            element.disabled = disabled;
+        });
+    }
+
+    function resetLists() {
+        if (progressList) {
+            progressList.innerHTML = '<li>Tidak ada progres tersimpan.</li>';
+        }
+        if (quizStatsList) {
+            quizStatsList.innerHTML = '<li>Belum ada aktivitas quiz.</li>';
+        }
+        if (simulationHistoryList) {
+            simulationHistoryList.innerHTML = '<li>Tidak ada riwayat simulasi.</li>';
+        }
+        if (quizHistoryList) {
+            quizHistoryList.innerHTML = '<li>Tidak ada riwayat quiz.</li>';
+        }
+    }
+
+    function populateProfileInfo(user) {
+        profileSnapshot = user ? { ...user } : null;
+        const displayName = user?.full_name || user?.email || 'Profil SimuLab';
+        if (nameDisplay) nameDisplay.textContent = displayName;
+        if (emailDisplay) emailDisplay.textContent = user?.email || '-';
+        if (joinedDisplay) joinedDisplay.textContent = user?.created_at
+            ? `Bergabung: ${formatDateTime(user.created_at)}`
+            : 'Bergabung: -';
+        if (fullNameInput) fullNameInput.value = user?.full_name || '';
+        if (institutionInput) institutionInput.value = user?.institution || '';
+        if (bioInput) bioInput.value = user?.bio || '';
+    }
+
+    function renderProgress(progress) {
+        if (!progressList) return;
+        progressList.innerHTML = '';
+        if (!progress || !progress.length) {
+            progressList.innerHTML = '<li>Tidak ada progres tersimpan.</li>';
+            return;
+        }
+        progress.slice(0, 6).forEach((record) => {
+            const summary = createProgressSummary({
+                experiment: record.experiment,
+                payload: record.payload,
+            });
+            const item = document.createElement('li');
+            const title = document.createElement('strong');
+            title.textContent = formatExperimentName(record.experiment);
+            const detail = document.createElement('span');
+            detail.textContent = summary;
+            const timestamp = record.updated_at || record.created_at;
+            const time = document.createElement('time');
+            time.dateTime = timestamp || '';
+            time.textContent = `Terakhir diperbarui: ${formatDateTime(timestamp)}`;
+            item.append(title, detail, time);
+            progressList.appendChild(item);
+        });
+    }
+
+    function renderQuizStats(stats) {
+        if (!quizStatsList) return;
+        quizStatsList.innerHTML = '';
+        if (!stats || !stats.length) {
+            quizStatsList.innerHTML = '<li>Belum ada aktivitas quiz.</li>';
+            return;
+        }
+        stats.forEach((row) => {
+            const attempts = Number(row.attempts) || 0;
+            const correct = Number(row.correctcount) || 0;
+            const incorrect = Number(row.incorrectcount) || 0;
+            const successRate = attempts ? Math.round((correct / attempts) * 100) : 0;
+            const item = document.createElement('li');
+            const title = document.createElement('strong');
+            title.textContent = formatExperimentName(row.experiment);
+            const detail = document.createElement('span');
+            detail.textContent = `${correct} benar • ${incorrect} salah • ${successRate}% akurasi`;
+            const time = document.createElement('time');
+            time.dateTime = row.last_attempt_at || '';
+            time.textContent = row.last_attempt_at
+                ? `Aktivitas terakhir: ${formatDateTime(row.last_attempt_at)}`
+                : 'Belum ada percobaan.';
+            item.append(title, detail, time);
+            quizStatsList.appendChild(item);
+        });
+    }
+
+    function renderSimulationHistory(activity) {
+        if (!simulationHistoryList) return;
+        simulationHistoryList.innerHTML = '';
+        const records = (activity || []).filter((item) => item.type === 'simulation_progress');
+        if (!records.length) {
+            simulationHistoryList.innerHTML = '<li>Tidak ada riwayat simulasi.</li>';
+            return;
+        }
+        records.slice(0, 30).forEach((entry) => {
+            const item = document.createElement('li');
+            const title = document.createElement('strong');
+            title.textContent = formatExperimentName(entry.experiment);
+            const payload = entry.metadata?.payload ?? entry.metadata;
+            const summary = createProgressSummary({ experiment: entry.experiment, payload });
+            const detail = document.createElement('span');
+            detail.textContent = summary;
+            const time = document.createElement('time');
+            time.dateTime = entry.created_at || '';
+            time.textContent = formatDateTime(entry.created_at);
+            item.append(title, detail, time);
+            simulationHistoryList.appendChild(item);
+        });
+    }
+
+    function renderQuizHistory(activity) {
+        if (!quizHistoryList) return;
+        quizHistoryList.innerHTML = '';
+        const records = (activity || []).filter((item) => item.type === 'quiz_attempt');
+        if (!records.length) {
+            quizHistoryList.innerHTML = '<li>Tidak ada riwayat quiz.</li>';
+            return;
+        }
+        records.slice(0, 30).forEach((entry) => {
+            const metadata = entry.metadata || {};
+            const isCorrect = Boolean(metadata.correct);
+            const decimals = Number.isFinite(metadata.decimals) ? metadata.decimals : 2;
+            const item = document.createElement('li');
+            const badge = document.createElement('span');
+            badge.className = 'badge';
+            badge.textContent = isCorrect ? 'Benar' : 'Belum Tepat';
+            if (isCorrect) {
+                badge.classList.add('accent');
+            }
+            const title = document.createElement('strong');
+            title.textContent = formatExperimentName(entry.experiment);
+            const answerText = formatNumberLocale(metadata.answer, decimals);
+            const expectedText = formatNumberLocale(metadata.expected, decimals);
+            const toleranceText = Number.isFinite(metadata.tolerance)
+                ? ` ± ${formatNumberLocale(metadata.tolerance, Math.min(decimals + 1, 4))}`
+                : '';
+            const detail = document.createElement('span');
+            detail.textContent = `Jawaban: ${answerText} • Target: ${expectedText}${toleranceText}`;
+            const time = document.createElement('time');
+            const recordedAt = metadata.recordedAt || entry.created_at;
+            time.dateTime = recordedAt || '';
+            time.textContent = formatDateTime(recordedAt);
+            item.append(badge, title, detail, time);
+            quizHistoryList.appendChild(item);
+        });
+    }
+
+    function setLoading(loading) {
+        isLoading = loading;
+        if (loadingCard) loadingCard.classList.toggle('hidden', !loading);
+        setFormDisabled(loading);
+    }
+
+    async function fetchProfileData() {
+        if (!authToken) return;
+        setLoading(true);
+        clearStatus();
+        try {
+            const data = await apiRequest('/profile');
+            if (data.user) {
+                currentUser = { ...(currentUser || {}), ...data.user };
+            }
+            populateProfileInfo(data.user);
+            renderProgress(data.progress);
+            renderQuizStats(data.quizStats);
+            renderSimulationHistory(data.activity);
+            renderQuizHistory(data.activity);
+            setStatus('Data profil diperbarui.', 'success');
+        } catch (error) {
+            setStatus(error.message || 'Tidak dapat memuat data profil.', 'error', 5000);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    function showGuestView() {
+        if (guestNotice) guestNotice.classList.remove('hidden');
+        if (contentSection) contentSection.classList.add('hidden');
+        if (loginButton) loginButton.classList.remove('hidden');
+        setFormDisabled(true);
+        populateProfileInfo(null);
+        resetLists();
+        clearStatus();
+        setLoading(false);
+    }
+
+    function showProfileView() {
+        if (guestNotice) guestNotice.classList.add('hidden');
+        if (contentSection) contentSection.classList.remove('hidden');
+        if (loginButton) loginButton.classList.add('hidden');
+        setFormDisabled(isLoading);
+    }
+
+    registerAuthSubscriber((isLoggedIn) => {
+        if (!isLoggedIn) {
+            profileSnapshot = null;
+            showGuestView();
+            return;
+        }
+        showProfileView();
+        populateProfileInfo(currentUser);
+        fetchProfileData();
+    });
+
+    if (loginButton) {
+        loginButton.addEventListener('click', () => {
+            openLandingLogin(buildRedirectTarget() || 'profile.html');
+        });
+    }
+
+    if (form) {
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            if (!authToken) {
+                setStatus('Masuk terlebih dahulu untuk menyimpan profil.', 'error');
+                return;
+            }
+            setFormDisabled(true);
+            setStatus('Menyimpan perubahan...', null, 0);
+            try {
+                const payload = {
+                    fullName: fullNameInput ? fullNameInput.value : '',
+                    institution: institutionInput ? institutionInput.value : '',
+                    bio: bioInput ? bioInput.value : '',
+                };
+                const response = await apiRequest('/profile', {
+                    method: 'PUT',
+                    body: payload,
+                });
+                if (response.user) {
+                    currentUser = { ...(currentUser || {}), ...response.user };
+                    populateProfileInfo(response.user);
+                }
+                setStatus('Perubahan tersimpan.', 'success');
+            } catch (error) {
+                setStatus(error.message || 'Profil gagal diperbarui.', 'error', 6000);
+            } finally {
+                setFormDisabled(false);
+            }
+        });
+    }
+
+    if (resetButton) {
+        resetButton.addEventListener('click', (event) => {
+            event.preventDefault();
+            if (profileSnapshot) {
+                populateProfileInfo(profileSnapshot);
+            } else {
+                populateProfileInfo(null);
+            }
+            clearStatus();
+        });
+    }
+
+    if (currentUser && authToken) {
+        showProfileView();
+        populateProfileInfo(currentUser);
+        fetchProfileData();
+    } else {
+        showGuestView();
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     initAuth();
     initPendulum();
     initFreeFall();
     initProjectile();
     initLandingPageEnhancements();
+    initProfilePage();
 
     loadCurrentUser()
         .then(() => {
