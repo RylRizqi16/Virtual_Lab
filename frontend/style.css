@@ -30,12 +30,18 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 20px;
     max-width: 1200px;
     margin: 24px auto;
     padding: 12px 20px;
     background: var(--color-card);
     border-radius: var(--radius);
     box-shadow: var(--shadow-light);
+}
+.nav-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 .brand {
     display: flex;
@@ -56,6 +62,7 @@ body {
 .nav-links {
     list-style: none;
     display: flex;
+    align-items: center;
     gap: 10px;
 }
 .nav-links .link {
@@ -72,7 +79,6 @@ body {
     transition: background 0.2s ease, color 0.2s ease;
 }
 .nav-links .link:hover { background: #f0f7ff; }
-.nav-links .link.outline { border-style: dashed; }
 .user-badge {
     display: inline-flex;
     align-items: center;

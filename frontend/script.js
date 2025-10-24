@@ -243,11 +243,9 @@ function updateAuthUI() {
     if (authButton) {
         if (hasModal) {
             authButton.textContent = isLoggedIn ? 'Kelola Akun' : 'Masuk';
-            authButton.classList.toggle('outline', !isLoggedIn);
             authButton.classList.remove('hidden');
         } else {
             authButton.textContent = 'Masuk';
-            authButton.classList.add('outline');
             authButton.classList.toggle('hidden', isLoggedIn);
         }
     }
@@ -267,7 +265,17 @@ function updateAuthUI() {
             : 'Masuk untuk menyimpan progres eksperimen Anda.';
     }
     if (userDisplay) {
-        userDisplay.textContent = isLoggedIn ? (currentUser.email || 'Pengguna') : '';
+        if (isLoggedIn) {
+            const rawName = typeof currentUser.full_name === 'string' ? currentUser.full_name.trim() : '';
+            const label = rawName || currentUser.email || 'Pengguna';
+            userDisplay.textContent = label;
+            if (currentUser.email) {
+                userDisplay.setAttribute('title', currentUser.email);
+            }
+        } else {
+            userDisplay.textContent = '';
+            userDisplay.removeAttribute('title');
+        }
         userDisplay.classList.toggle('is-hidden', !isLoggedIn);
     }
 

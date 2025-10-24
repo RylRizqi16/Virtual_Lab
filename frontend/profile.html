@@ -8,19 +8,20 @@
 </head>
 <body data-profile-page="true">
     <nav class="top-nav">
-        <a class="brand" href="index.html" title="Beranda SimuLab">
-            <span class="logo-dot"></span>
-            <span>SimuLab</span>
-        </a>
+        <div class="nav-left">
+            <a class="brand" href="index.html" title="Beranda SimuLab">
+                <span class="logo-dot"></span>
+                <span>SimuLab</span>
+            </a>
+            <span id="userDisplay" class="user-badge is-hidden" aria-live="polite"></span>
+        </div>
         <ul class="nav-links">
-            <li><a class="link" href="index.html">Beranda</a></li>
             <li><a class="link" href="pendulum.html">Bandul</a></li>
             <li><a class="link" href="freefall.html">Jatuh Bebas</a></li>
             <li><a class="link" href="projectile.html">Meriam</a></li>
             <li><a class="link" href="profile.html">Profil</a></li>
-            <li><span id="userDisplay" class="user-badge is-hidden" aria-live="polite"></span></li>
-            <li><button id="authButton" class="link outline" type="button">Masuk</button></li>
-            <li><button id="logoutButton" class="link outline hidden" type="button">Keluar</button></li>
+            <li><button id="authButton" class="link" type="button">Masuk</button></li>
+            <li><button id="logoutButton" class="link hidden" type="button">Keluar</button></li>
         </ul>
     </nav>
 
