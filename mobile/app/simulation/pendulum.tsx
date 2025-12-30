@@ -7,11 +7,12 @@ import {
   TouchableOpacity,
   Dimensions,
   Platform,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Line, Circle, Defs, RadialGradient, Stop } from 'react-native-svg';
 import { Ionicons } from '@expo/vector-icons';
-import { SliderInput } from '@/components/ui';
+import { SliderInput, QuizCard } from '@/components/ui';
 import { saveProgress, PendulumData } from '@/lib/database';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -159,13 +160,17 @@ export default function PendulumSimulation() {
     
     // Save to database if user is logged in
     if (user) {
-      await saveProgress('pendulum', {
+      const result = await saveProgress('pendulum', {
         L: length,
         T10: totalTimeSeconds,
         T: periodT,
         g: calculatedG,
         capturedAt: new Date().toISOString(),
       } as PendulumData);
+      
+      if (result.success) {
+        Alert.alert('Eksperimen Selesai', 'Progres berhasil disimpan!');
+      }
     }
     
     setIsExperimenting(false);
@@ -388,6 +393,9 @@ export default function PendulumSimulation() {
             amplitudo (untuk sudut kecil).
           </Text>
         </View>
+
+        {/* Quiz Card */}
+        <QuizCard experiment="pendulum" title="Kuis Bandul" />
       </ScrollView>
     </SafeAreaView>
   );

@@ -1,13 +1,19 @@
-import { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Modal, TextInput } from 'react-native';
+import { useState, useEffect, useCallback } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Modal, TextInput, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/AuthContext';
+import { getUserStats, UserStats } from '@/lib/database';
 
 export default function ProfileScreen() {
   const { user, signOut } = useAuth();
   const router = useRouter();
+  
+  // Stats state
+  const [stats, setStats] = useState<UserStats | null>(null);
+  const [isLoadingStats, setIsLoadingStats] = useState(true);
   
   // Modal states
   const [editProfileVisible, setEditProfileVisible] = useState(false);
@@ -19,6 +25,32 @@ export default function ProfileScreen() {
   
   // Edit profile state
   const [fullName, setFullName] = useState(user?.user_metadata?.full_name || '');
+
+  // Fetch stats when screen is focused
+  const fetchStats = useCallback(async () => {
+    if (!user) {
+      setStats(null);
+      setIsLoadingStats(false);
+      return;
+    }
+    
+    setIsLoadingStats(true);
+    try {
+      const userStats = await getUserStats();
+      setStats(userStats);
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    } finally {
+      setIsLoadingStats(false);
+    }
+  }, [user]);
+
+  // Refetch stats when screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      fetchStats();
+    }, [fetchStats])
+  );
 
   const handleSignOut = async () => {
     Alert.alert(
@@ -52,19 +84,39 @@ export default function ProfileScreen() {
     { icon: 'information-circle-outline', title: 'Tentang', onPress: () => setAboutVisible(true) },
   ];
 
-  // Progress data
-  const progressData = [
-    { name: 'Jatuh Bebas', completed: 3, total: 5 },
-    { name: 'Bandul', completed: 2, total: 5 },
-    { name: 'Gerak Parabola', completed: 1, total: 5 },
+  // Progress data from stats
+  const progressData = stats?.experimentProgress || [
+    { name: 'Jatuh Bebas', completed: 0, total: 5 },
+    { name: 'Bandul', completed: 0, total: 5 },
+    { name: 'Gerak Parabola', completed: 0, total: 5 },
   ];
 
-  // Achievements data
+  // Achievements data (computed from stats)
   const achievements = [
-    { icon: 'rocket', title: 'Pemula', description: 'Selesaikan simulasi pertama', unlocked: true },
-    { icon: 'flask', title: 'Eksperimenter', description: 'Selesaikan 5 eksperimen', unlocked: false },
-    { icon: 'trophy', title: 'Ahli Fisika', description: 'Selesaikan semua simulasi', unlocked: false },
-    { icon: 'star', title: 'Bintang', description: 'Dapatkan skor 100% di kuis', unlocked: false },
+    { 
+      icon: 'rocket', 
+      title: 'Pemula', 
+      description: 'Selesaikan simulasi pertama', 
+      unlocked: (stats?.totalExperiments || 0) >= 1 
+    },
+    { 
+      icon: 'flask', 
+      title: 'Eksperimenter', 
+      description: 'Selesaikan 5 eksperimen', 
+      unlocked: (stats?.totalExperiments || 0) >= 5 
+    },
+    { 
+      icon: 'trophy', 
+      title: 'Ahli Fisika', 
+      description: 'Selesaikan semua simulasi', 
+      unlocked: (stats?.progressPercent || 0) >= 100 
+    },
+    { 
+      icon: 'star', 
+      title: 'Bintang', 
+      description: 'Jawab 10 kuis dengan benar', 
+      unlocked: (stats?.totalQuizCorrect || 0) >= 10 
+    },
   ];
 
   // FAQ data
@@ -90,20 +142,29 @@ export default function ProfileScreen() {
 
         {/* Stats */}
         <View style={styles.statsContainer}>
-          <View style={styles.statItem}>
-            <Text style={styles.statValue}>0</Text>
-            <Text style={styles.statLabel}>Eksperimen</Text>
-          </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statItem}>
-            <Text style={styles.statValue}>0</Text>
-            <Text style={styles.statLabel}>Kuis</Text>
-          </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statItem}>
-            <Text style={styles.statValue}>0%</Text>
-            <Text style={styles.statLabel}>Progres</Text>
-          </View>
+          {isLoadingStats ? (
+            <View style={styles.loadingStats}>
+              <ActivityIndicator size="small" color="#0a58ca" />
+              <Text style={styles.loadingText}>Memuat...</Text>
+            </View>
+          ) : (
+            <>
+              <View style={styles.statItem}>
+                <Text style={styles.statValue}>{stats?.totalExperiments || 0}</Text>
+                <Text style={styles.statLabel}>Eksperimen</Text>
+              </View>
+              <View style={styles.statDivider} />
+              <View style={styles.statItem}>
+                <Text style={styles.statValue}>{stats?.totalQuizAttempts || 0}</Text>
+                <Text style={styles.statLabel}>Kuis</Text>
+              </View>
+              <View style={styles.statDivider} />
+              <View style={styles.statItem}>
+                <Text style={styles.statValue}>{stats?.progressPercent || 0}%</Text>
+                <Text style={styles.statLabel}>Progres</Text>
+              </View>
+            </>
+          )}
         </View>
 
         {/* Menu Items */}
@@ -196,7 +257,22 @@ export default function ProfileScreen() {
               
               <View style={styles.totalProgress}>
                 <Text style={styles.totalProgressLabel}>Total Progres</Text>
-                <Text style={styles.totalProgressValue}>40%</Text>
+                <Text style={styles.totalProgressValue}>{stats?.progressPercent || 0}%</Text>
+              </View>
+              
+              {/* Quiz Stats */}
+              <View style={styles.quizStatsSection}>
+                <Text style={styles.quizStatsTitle}>Statistik Kuis</Text>
+                <View style={styles.quizStatsRow}>
+                  <View style={styles.quizStatItem}>
+                    <Text style={styles.quizStatValue}>{stats?.totalQuizAttempts || 0}</Text>
+                    <Text style={styles.quizStatLabel}>Total Percobaan</Text>
+                  </View>
+                  <View style={styles.quizStatItem}>
+                    <Text style={[styles.quizStatValue, styles.correctValue]}>{stats?.totalQuizCorrect || 0}</Text>
+                    <Text style={styles.quizStatLabel}>Jawaban Benar</Text>
+                  </View>
+                </View>
               </View>
             </View>
           </View>
@@ -768,5 +844,56 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#0a58ca',
     textDecorationLine: 'underline',
+  },
+  // Loading styles
+  loadingStats: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 10,
+  },
+  loadingText: {
+    fontSize: 14,
+    color: '#3e4a6b',
+  },
+  // Quiz stats styles
+  quizStatsSection: {
+    marginTop: 20,
+    paddingTop: 20,
+    borderTopWidth: 1,
+    borderTopColor: '#dbe6ff',
+  },
+  quizStatsTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1b2a4e',
+    marginBottom: 16,
+  },
+  quizStatsRow: {
+    flexDirection: 'row',
+    gap: 16,
+  },
+  quizStatItem: {
+    flex: 1,
+    backgroundColor: '#f5f9ff',
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+  },
+  quizStatValue: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#0a58ca',
+    marginBottom: 4,
+  },
+  correctValue: {
+    color: '#1abc9c',
+  },
+  quizStatLabel: {
+    fontSize: 12,
+    color: '#3e4a6b',
+    textAlign: 'center',
   },
 });

@@ -7,11 +7,12 @@ import {
   TouchableOpacity,
   Dimensions,
   Platform,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Line, Circle, Rect, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { Ionicons } from '@expo/vector-icons';
-import { SliderInput } from '@/components/ui';
+import { SliderInput, QuizCard } from '@/components/ui';
 import { saveProgress, FreefallData } from '@/lib/database';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -62,7 +63,7 @@ export default function FreefallSimulation() {
   const ballY = CANVAS_HEIGHT - GROUND_MARGIN - (Math.max(0, Math.min(positionY, maxDisplayHeight)) * pxPerMeter);
 
   // Animation loop
-  const animate = useCallback((timestamp: number) => {
+  const animate = useCallback(async (timestamp: number) => {
     if (!lastTimestampRef.current) {
       lastTimestampRef.current = timestamp;
     }
@@ -94,7 +95,7 @@ export default function FreefallSimulation() {
         const run = activeRunRef.current;
         const impactVelocity = Math.sqrt(Math.max(0, 2 * run.gravity * run.height));
         
-        saveProgress('freefall', {
+        const result = await saveProgress('freefall', {
           height: run.height,
           mass: run.mass,
           gravity: run.gravity,
@@ -102,6 +103,11 @@ export default function FreefallSimulation() {
           impactVelocity,
           capturedAt: new Date().toISOString(),
         } as FreefallData);
+        
+        // Show feedback to user
+        if (result.success) {
+          Alert.alert('Eksperimen Selesai', 'Progres berhasil disimpan!');
+        }
       }
       
       activeRunRef.current = null;
@@ -398,6 +404,9 @@ export default function FreefallSimulation() {
             yang sama, tidak bergantung pada massanya.
           </Text>
         </View>
+
+        {/* Quiz Card */}
+        <QuizCard experiment="freefall" title="Kuis Jatuh Bebas" />
       </ScrollView>
     </SafeAreaView>
   );

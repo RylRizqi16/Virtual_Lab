@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Dimensions,
   Platform,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { 
@@ -21,7 +22,7 @@ import Svg, {
   Text as SvgText 
 } from 'react-native-svg';
 import { Ionicons } from '@expo/vector-icons';
-import { SliderInput } from '@/components/ui';
+import { SliderInput, QuizCard } from '@/components/ui';
 import { saveProgress, ProjectileData } from '@/lib/database';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -122,7 +123,7 @@ export default function ProjectileSimulation() {
   }, [getScale]);
 
   // Animation loop
-  const animate = useCallback((timestamp: number) => {
+  const animate = useCallback(async (timestamp: number) => {
     if (!lastTimestampRef.current) {
       lastTimestampRef.current = timestamp;
     }
@@ -149,7 +150,7 @@ export default function ProjectileSimulation() {
       // Save progress
       if (activeRunRef.current && user) {
         const run = activeRunRef.current;
-        saveProgress('projectile', {
+        const result = await saveProgress('projectile', {
           speed: run.speed,
           angle: run.angle,
           gravity: gravity,
@@ -158,6 +159,10 @@ export default function ProjectileSimulation() {
           maxHeight: run.expectedHmax,
           capturedAt: new Date().toISOString(),
         } as ProjectileData);
+        
+        if (result.success) {
+          Alert.alert('Eksperimen Selesai', 'Progres berhasil disimpan!');
+        }
       }
       
       activeRunRef.current = null;
@@ -538,6 +543,9 @@ export default function ProjectileSimulation() {
             jangkauan maksimum untuk kecepatan awal yang sama.
           </Text>
         </View>
+
+        {/* Quiz Card */}
+        <QuizCard experiment="projectile" title="Kuis Gerak Parabola" />
       </ScrollView>
     </SafeAreaView>
   );

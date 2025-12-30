@@ -86,11 +86,11 @@ export async function getExperimentProgress(
 export async function saveProgress(
   experiment: 'pendulum' | 'freefall' | 'projectile',
   payload: ProgressPayload
-): Promise<UserProgress | null> {
+): Promise<{ success: boolean; data: UserProgress | null; message: string }> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
     console.warn('User not logged in, progress not saved');
-    return null;
+    return { success: false, data: null, message: 'Masuk untuk menyimpan progres' };
   }
 
   // Add timestamp if not present
@@ -99,31 +99,37 @@ export async function saveProgress(
     capturedAt: payload.capturedAt || new Date().toISOString(),
   };
 
-  const { data, error } = await supabase
-    .from('user_progress')
-    .upsert(
-      {
-        user_id: user.id,
-        experiment,
-        payload: dataWithTimestamp,
-        updated_at: new Date().toISOString(),
-      },
-      {
-        onConflict: 'user_id,experiment',
-      }
-    )
-    .select()
-    .single();
+  try {
+    const { data, error } = await supabase
+      .from('user_progress')
+      .upsert(
+        {
+          user_id: user.id,
+          experiment,
+          payload: dataWithTimestamp,
+          updated_at: new Date().toISOString(),
+        },
+        {
+          onConflict: 'user_id,experiment',
+        }
+      )
+      .select()
+      .single();
 
-  if (error) {
-    console.error('Error saving progress:', error);
-    return null;
+    if (error) {
+      console.error('Error saving progress:', error);
+      return { success: false, data: null, message: 'Gagal menyimpan progres: ' + error.message };
+    }
+
+    // Log activity
+    await logActivity('simulation_progress', experiment, dataWithTimestamp);
+
+    console.log('Progress saved successfully:', data);
+    return { success: true, data, message: 'Progres berhasil disimpan!' };
+  } catch (err) {
+    console.error('Exception saving progress:', err);
+    return { success: false, data: null, message: 'Terjadi kesalahan saat menyimpan' };
   }
-
-  // Log activity
-  await logActivity('simulation_progress', experiment, dataWithTimestamp);
-
-  return data;
 }
 
 // Log activity (for history)
@@ -283,5 +289,113 @@ export function formatExperimentName(experiment: string): string {
       return 'Gerak Parabola';
     default:
       return experiment.charAt(0).toUpperCase() + experiment.slice(1);
+  }
+}
+
+// Get user statistics summary
+export interface UserStats {
+  totalExperiments: number;
+  totalQuizAttempts: number;
+  totalQuizCorrect: number;
+  progressPercent: number;
+  experimentProgress: {
+    name: string;
+    experiment: string;
+    completed: number;
+    total: number;
+  }[];
+}
+
+export async function getUserStats(): Promise<UserStats> {
+  const defaultStats: UserStats = {
+    totalExperiments: 0,
+    totalQuizAttempts: 0,
+    totalQuizCorrect: 0,
+    progressPercent: 0,
+    experimentProgress: [
+      { name: 'Jatuh Bebas', experiment: 'freefall', completed: 0, total: 5 },
+      { name: 'Bandul', experiment: 'pendulum', completed: 0, total: 5 },
+      { name: 'Gerak Parabola', experiment: 'projectile', completed: 0, total: 5 },
+    ],
+  };
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return defaultStats;
+
+  try {
+    // Get experiment progress count
+    const { data: progressData, error: progressError } = await supabase
+      .from('user_progress')
+      .select('experiment, payload')
+      .eq('user_id', user.id);
+
+    if (!progressError && progressData) {
+      defaultStats.totalExperiments = progressData.length;
+      
+      // Update experiment progress
+      progressData.forEach((p) => {
+        const expProgress = defaultStats.experimentProgress.find(
+          (e) => e.experiment === p.experiment
+        );
+        if (expProgress) {
+          // Count runs based on payload data
+          expProgress.completed = Math.min(expProgress.total, 1);
+        }
+      });
+    }
+
+    // Get quiz stats
+    const { data: quizData, error: quizError } = await supabase
+      .from('quiz_stats')
+      .select('attempts, correct_count')
+      .eq('user_id', user.id);
+
+    if (!quizError && quizData) {
+      quizData.forEach((q) => {
+        defaultStats.totalQuizAttempts += q.attempts || 0;
+        defaultStats.totalQuizCorrect += q.correct_count || 0;
+      });
+    }
+
+    // Get activity log for more accurate experiment count
+    const { data: activityData, error: activityError } = await supabase
+      .from('activity_log')
+      .select('experiment, type')
+      .eq('user_id', user.id)
+      .eq('type', 'simulation_progress');
+
+    if (!activityError && activityData) {
+      // Count unique experiments completed
+      const experimentCounts: Record<string, number> = {};
+      activityData.forEach((a) => {
+        experimentCounts[a.experiment] = (experimentCounts[a.experiment] || 0) + 1;
+      });
+
+      // Update experiment progress with actual counts
+      defaultStats.experimentProgress.forEach((exp) => {
+        const count = experimentCounts[exp.experiment] || 0;
+        exp.completed = Math.min(count, exp.total);
+      });
+
+      defaultStats.totalExperiments = activityData.length;
+    }
+
+    // Calculate overall progress percentage
+    const totalCompleted = defaultStats.experimentProgress.reduce(
+      (sum, e) => sum + e.completed,
+      0
+    );
+    const totalGoal = defaultStats.experimentProgress.reduce(
+      (sum, e) => sum + e.total,
+      0
+    );
+    defaultStats.progressPercent = totalGoal > 0 
+      ? Math.round((totalCompleted / totalGoal) * 100) 
+      : 0;
+
+    return defaultStats;
+  } catch (error) {
+    console.error('Error fetching user stats:', error);
+    return defaultStats;
   }
 }
