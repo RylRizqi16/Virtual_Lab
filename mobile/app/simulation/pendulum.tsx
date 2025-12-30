@@ -272,6 +272,7 @@ export default function PendulumSimulation() {
             maximumValue={2.5}
             step={0.1}
             unit="m"
+            disabled={isExperimenting}
           />
           
           <SliderInput
@@ -288,6 +289,7 @@ export default function PendulumSimulation() {
             maximumValue={45}
             step={1}
             unit="°"
+            disabled={isExperimenting}
           />
           
           <SliderInput
@@ -298,6 +300,7 @@ export default function PendulumSimulation() {
             maximumValue={5.0}
             step={0.1}
             unit="kg"
+            disabled={isExperimenting}
           />
           <Text style={styles.hintText}>
             * Massa tidak mempengaruhi periode bandul sederhana

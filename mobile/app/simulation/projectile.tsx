@@ -445,6 +445,7 @@ export default function ProjectileSimulation() {
             maximumValue={100}
             step={1}
             unit="m/s"
+            disabled={isRunning}
           />
           
           <SliderInput
@@ -458,6 +459,7 @@ export default function ProjectileSimulation() {
             maximumValue={85}
             step={1}
             unit="°"
+            disabled={isRunning}
           />
           
           <SliderInput
@@ -471,6 +473,7 @@ export default function ProjectileSimulation() {
             maximumValue={20}
             step={0.01}
             unit="m/s²"
+            disabled={isRunning}
           />
         </View>
 

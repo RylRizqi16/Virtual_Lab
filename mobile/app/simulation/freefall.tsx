@@ -292,6 +292,7 @@ export default function FreefallSimulation() {
             maximumValue={100}
             step={1}
             unit="m"
+            disabled={isRunning}
           />
           
           <SliderInput
@@ -302,6 +303,7 @@ export default function FreefallSimulation() {
             maximumValue={10}
             step={0.5}
             unit="kg"
+            disabled={isRunning}
           />
           <Text style={styles.hintText}>
             * Massa tidak mempengaruhi waktu jatuh (di vakum)
@@ -318,6 +320,7 @@ export default function FreefallSimulation() {
             maximumValue={20}
             step={0.01}
             unit="m/s²"
+            disabled={isRunning}
           />
         </View>
 

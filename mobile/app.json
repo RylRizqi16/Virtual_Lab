@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "SimuLab",
-    "slug": "simulab",
+    "slug": "virtual-lab",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -15,7 +15,10 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.simulab.app"
+      "bundleIdentifier": "com.simulab.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
