@@ -15,27 +15,27 @@ interface SimulationItem {
 const simulations: SimulationItem[] = [
   {
     id: 'freefall',
-    title: 'Free Fall',
-    description: 'Explore gravitational motion and acceleration due to gravity',
+    title: 'Jatuh Bebas',
+    description: 'Pelajari gerak gravitasi dan percepatan gravitasi bumi',
     icon: 'arrow-down-circle',
     route: '/simulation/freefall',
-    color: '#00d4ff',
+    color: '#0a58ca',
   },
   {
     id: 'pendulum',
-    title: 'Pendulum',
-    description: 'Study simple harmonic motion and oscillation periods',
+    title: 'Bandul Sederhana',
+    description: 'Pelajari gerak harmonik sederhana dan periode osilasi',
     icon: 'sync-circle',
     route: '/simulation/pendulum',
-    color: '#ff6b6b',
+    color: '#e74c3c',
   },
   {
     id: 'projectile',
-    title: 'Projectile Motion',
-    description: 'Analyze trajectory, range, and maximum height of projectiles',
+    title: 'Gerak Parabola',
+    description: 'Analisis lintasan, jangkauan, dan tinggi maksimum proyektil',
     icon: 'trending-up',
     route: '/simulation/projectile',
-    color: '#4ecdc4',
+    color: '#1abc9c',
   },
 ];
 
@@ -46,8 +46,8 @@ export default function SimulationsScreen() {
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
-          <Text style={styles.title}>Simulations</Text>
-          <Text style={styles.subtitle}>Choose an experiment to explore</Text>
+          <Text style={styles.title}>Simulasi</Text>
+          <Text style={styles.subtitle}>Pilih eksperimen untuk dijelajahi</Text>
         </View>
 
         <View style={styles.simulationsList}>
@@ -65,15 +65,15 @@ export default function SimulationsScreen() {
                 <Text style={styles.cardTitle}>{sim.title}</Text>
                 <Text style={styles.cardDescription}>{sim.description}</Text>
               </View>
-              <Ionicons name="chevron-forward" size={24} color="#666" />
+              <Ionicons name="chevron-forward" size={24} color="#3e4a6b" />
             </TouchableOpacity>
           ))}
         </View>
 
         <View style={styles.infoCard}>
-          <Ionicons name="information-circle" size={24} color="#00d4ff" />
+          <Ionicons name="information-circle" size={24} color="#0a58ca" />
           <Text style={styles.infoText}>
-            Each simulation includes interactive controls, real-time graphs, and educational content to help you understand physics concepts.
+            Setiap simulasi dilengkapi kontrol interaktif, grafik real-time, dan konten edukatif untuk membantu Anda memahami konsep fisika.
           </Text>
         </View>
       </ScrollView>
@@ -84,7 +84,7 @@ export default function SimulationsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#f5f9ff',
   },
   scrollContent: {
     padding: 20,
@@ -95,12 +95,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#1b2a4e',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#888',
+    color: '#3e4a6b',
   },
   simulationsList: {
     gap: 16,
@@ -108,11 +108,16 @@ const styles = StyleSheet.create({
   simulationCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderRadius: 16,
     padding: 20,
     borderWidth: 1,
-    borderColor: '#0f3460',
+    borderColor: '#dbe6ff',
+    shadowColor: '#0a58ca',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
   },
   iconContainer: {
     width: 70,
@@ -128,27 +133,29 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#fff',
+    color: '#1b2a4e',
     marginBottom: 4,
   },
   cardDescription: {
     fontSize: 14,
-    color: '#888',
+    color: '#3e4a6b',
     lineHeight: 20,
   },
   infoCard: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(0, 212, 255, 0.1)',
+    backgroundColor: 'rgba(10, 88, 202, 0.08)',
     borderRadius: 12,
     padding: 16,
     marginTop: 24,
     gap: 12,
     alignItems: 'flex-start',
+    borderWidth: 1,
+    borderColor: '#dbe6ff',
   },
   infoText: {
     flex: 1,
     fontSize: 14,
-    color: '#888',
+    color: '#3e4a6b',
     lineHeight: 20,
   },
 });

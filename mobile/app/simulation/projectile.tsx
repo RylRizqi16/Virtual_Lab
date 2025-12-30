@@ -401,14 +401,14 @@ export default function ProjectileSimulation() {
                   y1={CANVAS_HEIGHT - MARGIN_BOTTOM}
                   x2={MARGIN_LEFT + 50 * Math.cos(degToRad(angle))}
                   y2={CANVAS_HEIGHT - MARGIN_BOTTOM - 50 * Math.sin(degToRad(angle))}
-                  stroke="#ff6b6b"
+                  stroke="#e74c3c"
                   strokeWidth={2}
                   strokeDasharray="4,4"
                 />
                 <SvgText
                   x={MARGIN_LEFT + 60 * Math.cos(degToRad(angle / 2))}
                   y={CANVAS_HEIGHT - MARGIN_BOTTOM - 30 * Math.sin(degToRad(angle / 2))}
-                  fill="#ff6b6b"
+                  fill="#e74c3c"
                   fontSize={10}
                 >
                   {angle}°
@@ -480,7 +480,7 @@ export default function ProjectileSimulation() {
             onPress={startSimulation}
             disabled={isRunning}
           >
-            <Ionicons name="play" size={20} color="#1a1a2e" />
+            <Ionicons name="play" size={20} color="#ffffff" />
             <Text style={styles.primaryButtonText}>Luncurkan</Text>
           </TouchableOpacity>
           
@@ -488,7 +488,7 @@ export default function ProjectileSimulation() {
             style={[styles.button, styles.secondaryButton]}
             onPress={resetSimulation}
           >
-            <Ionicons name="refresh" size={20} color="#fff" />
+            <Ionicons name="refresh" size={20} color="#1b2a4e" />
             <Text style={styles.secondaryButtonText}>Reset</Text>
           </TouchableOpacity>
         </View>
@@ -546,7 +546,7 @@ export default function ProjectileSimulation() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#f5f9ff',
   },
   scrollContent: {
     padding: 20,
@@ -558,13 +558,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: '#0f3460',
+    borderColor: '#dbe6ff',
+    shadowColor: '#0a58ca',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
   },
   infoOverlay: {
     position: 'absolute',
     top: 10,
     right: 10,
-    backgroundColor: 'rgba(0,0,0,0.7)',
+    backgroundColor: 'rgba(27, 42, 78, 0.9)',
     padding: 10,
     borderRadius: 8,
   },
@@ -575,17 +580,22 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   controlsCard: {
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderRadius: 16,
     padding: 20,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#0f3460',
+    borderColor: '#dbe6ff',
+    shadowColor: '#0a58ca',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#fff',
+    color: '#1b2a4e',
     marginBottom: 16,
   },
   buttonRow: {
@@ -603,33 +613,38 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   primaryButton: {
-    backgroundColor: '#00d4ff',
+    backgroundColor: '#0a58ca',
   },
   secondaryButton: {
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderWidth: 1,
-    borderColor: '#0f3460',
+    borderColor: '#dbe6ff',
   },
   disabledButton: {
     opacity: 0.5,
   },
   primaryButtonText: {
-    color: '#1a1a2e',
+    color: '#ffffff',
     fontSize: 14,
     fontWeight: '600',
   },
   secondaryButtonText: {
-    color: '#fff',
+    color: '#1b2a4e',
     fontSize: 14,
     fontWeight: '600',
   },
   resultsCard: {
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderRadius: 16,
     padding: 20,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#0f3460',
+    borderColor: '#dbe6ff',
+    shadowColor: '#0a58ca',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
   },
   resultRow: {
     flexDirection: 'row',
@@ -637,41 +652,46 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#0f3460',
+    borderBottomColor: '#dbe6ff',
   },
   resultLabel: {
-    color: '#888',
+    color: '#3e4a6b',
     fontSize: 14,
   },
   resultValue: {
-    color: '#00d4ff',
+    color: '#0a58ca',
     fontSize: 16,
     fontWeight: '600',
     fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
   },
   theoryCard: {
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderRadius: 16,
     padding: 20,
     borderWidth: 1,
-    borderColor: '#0f3460',
+    borderColor: '#dbe6ff',
+    shadowColor: '#0a58ca',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
   },
   formulaContainer: {
-    backgroundColor: 'rgba(0, 212, 255, 0.1)',
+    backgroundColor: 'rgba(10, 88, 202, 0.08)',
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
     alignItems: 'center',
   },
   formulaText: {
-    color: '#00d4ff',
+    color: '#0a58ca',
     fontSize: 16,
     fontWeight: 'bold',
     fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
     marginVertical: 4,
   },
   theoryText: {
-    color: '#888',
+    color: '#3e4a6b',
     fontSize: 14,
     lineHeight: 22,
   },

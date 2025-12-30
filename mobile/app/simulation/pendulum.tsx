@@ -313,7 +313,7 @@ export default function PendulumSimulation() {
             <Ionicons 
               name={isExperimenting ? 'hourglass' : 'play'} 
               size={20} 
-              color="#1a1a2e" 
+              color="#ffffff" 
             />
             <Text style={styles.primaryButtonText}>
               {isExperimenting ? 'Mengukur...' : `Mulai (${TARGET_OSCILLATIONS} osilasi)`}
@@ -325,7 +325,7 @@ export default function PendulumSimulation() {
             onPress={resetSimulation}
             disabled={isExperimenting}
           >
-            <Ionicons name="refresh" size={20} color="#fff" />
+            <Ionicons name="refresh" size={20} color="#1b2a4e" />
             <Text style={styles.secondaryButtonText}>Reset</Text>
           </TouchableOpacity>
         </View>
@@ -396,25 +396,30 @@ export default function PendulumSimulation() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#f5f9ff',
   },
   scrollContent: {
     padding: 20,
   },
   canvasContainer: {
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderRadius: 16,
     padding: 10,
     alignItems: 'center',
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: '#0f3460',
+    borderColor: '#dbe6ff',
+    shadowColor: '#0a58ca',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
   },
   infoOverlay: {
     position: 'absolute',
     top: 10,
     left: 10,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(27, 42, 78, 0.9)',
     padding: 8,
     borderRadius: 8,
   },
@@ -424,22 +429,27 @@ const styles = StyleSheet.create({
     fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
   },
   controlsCard: {
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderRadius: 16,
     padding: 20,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#0f3460',
+    borderColor: '#dbe6ff',
+    shadowColor: '#0a58ca',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#fff',
+    color: '#1b2a4e',
     marginBottom: 16,
   },
   hintText: {
     fontSize: 12,
-    color: '#666',
+    color: '#3e4a6b',
     fontStyle: 'italic',
     marginTop: -8,
   },
@@ -458,33 +468,38 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   primaryButton: {
-    backgroundColor: '#00d4ff',
+    backgroundColor: '#0a58ca',
   },
   secondaryButton: {
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderWidth: 1,
-    borderColor: '#0f3460',
+    borderColor: '#dbe6ff',
   },
   disabledButton: {
     opacity: 0.6,
   },
   primaryButtonText: {
-    color: '#1a1a2e',
+    color: '#ffffff',
     fontSize: 14,
     fontWeight: '600',
   },
   secondaryButtonText: {
-    color: '#fff',
+    color: '#1b2a4e',
     fontSize: 14,
     fontWeight: '600',
   },
   resultsCard: {
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderRadius: 16,
     padding: 20,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#0f3460',
+    borderColor: '#dbe6ff',
+    shadowColor: '#0a58ca',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
   },
   resultsHeader: {
     flexDirection: 'row',
@@ -493,11 +508,11 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   clearButton: {
-    color: '#ff6b6b',
+    color: '#e74c3c',
     fontSize: 14,
   },
   emptyText: {
-    color: '#666',
+    color: '#3e4a6b',
     fontSize: 14,
     textAlign: 'center',
     padding: 20,
@@ -505,7 +520,7 @@ const styles = StyleSheet.create({
   tableHeader: {
     flexDirection: 'row',
     borderBottomWidth: 1,
-    borderBottomColor: '#0f3460',
+    borderBottomColor: '#dbe6ff',
     paddingBottom: 8,
     marginBottom: 8,
   },
@@ -513,10 +528,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#0f3460',
+    borderBottomColor: '#dbe6ff',
   },
   tableCell: {
-    color: '#fff',
+    color: '#1b2a4e',
     fontSize: 12,
   },
   cellNo: { width: 25 },
@@ -530,27 +545,32 @@ const styles = StyleSheet.create({
     marginTop: 16,
     paddingTop: 16,
     borderTopWidth: 2,
-    borderTopColor: '#00d4ff',
+    borderTopColor: '#0a58ca',
   },
   averageLabel: {
-    color: '#888',
+    color: '#3e4a6b',
     fontSize: 14,
     fontWeight: '600',
   },
   averageValue: {
-    color: '#00d4ff',
+    color: '#0a58ca',
     fontSize: 18,
     fontWeight: 'bold',
   },
   theoryCard: {
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderRadius: 16,
     padding: 20,
     borderWidth: 1,
-    borderColor: '#0f3460',
+    borderColor: '#dbe6ff',
+    shadowColor: '#0a58ca',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
   },
   formulaText: {
-    color: '#00d4ff',
+    color: '#0a58ca',
     fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'center',
@@ -558,7 +578,7 @@ const styles = StyleSheet.create({
     fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
   },
   theoryText: {
-    color: '#888',
+    color: '#3e4a6b',
     fontSize: 14,
     lineHeight: 22,
   },

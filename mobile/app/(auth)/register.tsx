@@ -24,17 +24,17 @@ export default function RegisterScreen() {
 
   const handleRegister = async () => {
     if (!fullName || !email || !password || !confirmPassword) {
-      Alert.alert('Error', 'Please fill in all fields');
+      Alert.alert('Error', 'Mohon isi semua kolom');
       return;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
+      Alert.alert('Error', 'Kata sandi tidak cocok');
       return;
     }
 
     if (password.length < 6) {
-      Alert.alert('Error', 'Password must be at least 6 characters');
+      Alert.alert('Error', 'Kata sandi minimal 6 karakter');
       return;
     }
 
@@ -43,11 +43,11 @@ export default function RegisterScreen() {
     setLoading(false);
 
     if (error) {
-      Alert.alert('Registration Failed', error.message);
+      Alert.alert('Pendaftaran Gagal', error.message);
     } else {
       Alert.alert(
-        'Success',
-        'Registration successful! Please check your email to verify your account.',
+        'Berhasil',
+        'Pendaftaran berhasil! Silakan periksa email Anda untuk verifikasi akun.',
         [{ text: 'OK', onPress: () => router.replace('/(auth)/login') }]
       );
     }
@@ -63,16 +63,16 @@ export default function RegisterScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.header}>
-          <Text style={styles.title}>Virtual Lab</Text>
-          <Text style={styles.subtitle}>Create Account</Text>
+          <Text style={styles.title}>SimuLab</Text>
+          <Text style={styles.subtitle}>Buat Akun</Text>
         </View>
 
         <View style={styles.form}>
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Full Name</Text>
+            <Text style={styles.label}>Nama Lengkap</Text>
             <TextInput
               style={styles.input}
-              placeholder="Enter your full name"
+              placeholder="Masukkan nama lengkap Anda"
               placeholderTextColor="#666"
               value={fullName}
               onChangeText={setFullName}
@@ -84,7 +84,7 @@ export default function RegisterScreen() {
             <Text style={styles.label}>Email</Text>
             <TextInput
               style={styles.input}
-              placeholder="Enter your email"
+              placeholder="Masukkan email Anda"
               placeholderTextColor="#666"
               value={email}
               onChangeText={setEmail}
@@ -95,10 +95,10 @@ export default function RegisterScreen() {
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Password</Text>
+            <Text style={styles.label}>Kata Sandi</Text>
             <TextInput
               style={styles.input}
-              placeholder="Create a password"
+              placeholder="Buat kata sandi"
               placeholderTextColor="#666"
               value={password}
               onChangeText={setPassword}
@@ -107,10 +107,10 @@ export default function RegisterScreen() {
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Confirm Password</Text>
+            <Text style={styles.label}>Konfirmasi Kata Sandi</Text>
             <TextInput
               style={styles.input}
-              placeholder="Confirm your password"
+              placeholder="Konfirmasi kata sandi Anda"
               placeholderTextColor="#666"
               value={confirmPassword}
               onChangeText={setConfirmPassword}
@@ -124,15 +124,15 @@ export default function RegisterScreen() {
             disabled={loading}
           >
             <Text style={styles.buttonText}>
-              {loading ? 'Creating Account...' : 'Sign Up'}
+              {loading ? 'Membuat Akun...' : 'Daftar'}
             </Text>
           </TouchableOpacity>
 
           <View style={styles.footer}>
-            <Text style={styles.footerText}>Already have an account? </Text>
+            <Text style={styles.footerText}>Sudah punya akun? </Text>
             <Link href="/(auth)/login" asChild>
               <TouchableOpacity>
-                <Text style={styles.link}>Sign In</Text>
+                <Text style={styles.link}>Masuk</Text>
               </TouchableOpacity>
             </Link>
           </View>
@@ -145,7 +145,7 @@ export default function RegisterScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#f5f9ff',
   },
   scrollContent: {
     flexGrow: 1,
@@ -159,50 +159,63 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 36,
     fontWeight: 'bold',
-    color: '#00d4ff',
+    color: '#0a58ca',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 18,
-    color: '#888',
+    color: '#3e4a6b',
   },
   form: {
     width: '100%',
     maxWidth: 400,
     alignSelf: 'center',
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 24,
+    shadowColor: '#0a58ca',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
   },
   inputContainer: {
     marginBottom: 20,
   },
   label: {
-    color: '#fff',
+    color: '#3e4a6b',
     fontSize: 14,
     fontWeight: '600',
     marginBottom: 8,
   },
   input: {
-    backgroundColor: '#16213e',
+    backgroundColor: '#f7faff',
     borderWidth: 1,
-    borderColor: '#0f3460',
-    borderRadius: 12,
-    padding: 16,
-    color: '#fff',
+    borderColor: '#ccd9ff',
+    borderRadius: 10,
+    padding: 14,
+    color: '#1b2a4e',
     fontSize: 16,
   },
   button: {
-    backgroundColor: '#00d4ff',
+    backgroundColor: '#0a58ca',
     borderRadius: 12,
-    padding: 16,
+    padding: 14,
     alignItems: 'center',
     marginTop: 12,
+    shadowColor: '#0a58ca',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 3,
   },
   buttonDisabled: {
     opacity: 0.6,
   },
   buttonText: {
-    color: '#1a1a2e',
+    color: '#ffffff',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '600',
   },
   footer: {
     flexDirection: 'row',
@@ -210,11 +223,11 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   footerText: {
-    color: '#888',
+    color: '#54648c',
     fontSize: 14,
   },
   link: {
-    color: '#00d4ff',
+    color: '#0a58ca',
     fontSize: 14,
     fontWeight: '600',
   },

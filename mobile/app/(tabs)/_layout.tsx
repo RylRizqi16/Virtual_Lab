@@ -7,11 +7,11 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#00d4ff',
-        tabBarInactiveTintColor: '#888',
+        tabBarActiveTintColor: '#0a58ca',
+        tabBarInactiveTintColor: '#6c757d',
         tabBarStyle: {
-          backgroundColor: '#16213e',
-          borderTopColor: '#0f3460',
+          backgroundColor: '#ffffff',
+          borderTopColor: '#dbe6ff',
           borderTopWidth: 1,
           paddingBottom: Platform.OS === 'ios' ? 20 : 5,
           paddingTop: 5,
@@ -26,7 +26,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="home"
         options={{
-          title: 'Home',
+          title: 'Beranda',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home" size={size} color={color} />
           ),
@@ -35,7 +35,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="simulations"
         options={{
-          title: 'Simulations',
+          title: 'Simulasi',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="flask" size={size} color={color} />
           ),
@@ -44,7 +44,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'Profile',
+          title: 'Profil',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person" size={size} color={color} />
           ),

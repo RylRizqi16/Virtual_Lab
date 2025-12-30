@@ -22,7 +22,7 @@ export const TextInput = forwardRef<RNTextInput, TextInputProps>(
             error && styles.inputError,
             style,
           ]}
-          placeholderTextColor="#666"
+          placeholderTextColor="#3e4a6b"
           onFocus={(e) => {
             setIsFocused(true);
             onFocus?.(e);
@@ -46,28 +46,28 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   label: {
-    color: '#fff',
+    color: '#1b2a4e',
     fontSize: 14,
     fontWeight: '600',
     marginBottom: 8,
   },
   input: {
-    backgroundColor: '#16213e',
+    backgroundColor: '#f7faff',
     borderWidth: 1,
-    borderColor: '#0f3460',
+    borderColor: '#dbe6ff',
     borderRadius: 12,
     padding: 16,
-    color: '#fff',
+    color: '#1b2a4e',
     fontSize: 16,
   },
   inputFocused: {
-    borderColor: '#00d4ff',
+    borderColor: '#0a58ca',
   },
   inputError: {
-    borderColor: '#ff6b6b',
+    borderColor: '#e74c3c',
   },
   error: {
-    color: '#ff6b6b',
+    color: '#e74c3c',
     fontSize: 12,
     marginTop: 4,
   },

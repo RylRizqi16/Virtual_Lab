@@ -35,9 +35,9 @@ export function SliderInput({
         minimumValue={minimumValue}
         maximumValue={maximumValue}
         step={step}
-        minimumTrackTintColor="#00d4ff"
-        maximumTrackTintColor="#0f3460"
-        thumbTintColor="#00d4ff"
+        minimumTrackTintColor="#0a58ca"
+        maximumTrackTintColor="#dbe6ff"
+        thumbTintColor="#0a58ca"
       />
       <View style={styles.rangeLabels}>
         <Text style={styles.rangeLabel}>{minimumValue}{unit}</Text>
@@ -58,12 +58,12 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   label: {
-    color: '#fff',
+    color: '#1b2a4e',
     fontSize: 14,
     fontWeight: '600',
   },
   value: {
-    color: '#00d4ff',
+    color: '#0a58ca',
     fontSize: 16,
     fontWeight: 'bold',
   },
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   rangeLabel: {
-    color: '#666',
+    color: '#3e4a6b',
     fontSize: 12,
   },
 });

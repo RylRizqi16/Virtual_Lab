@@ -1,34 +1,39 @@
-// Color palette based on original Virtual Lab design
+// Color palette matching web version (light theme)
 export const colors = {
-  // Primary colors
-  primary: '#00d4ff',
-  primaryDark: '#00a8cc',
-  primaryLight: '#4de3ff',
+  // Primary colors (from web CSS variables)
+  primary: '#0a58ca',
+  primaryDark: '#084298',
+  primaryLight: '#3d7dd9',
+  accent: '#0dcaf0',
 
   // Background colors
-  background: '#1a1a2e',
-  surface: '#16213e',
-  surfaceLight: '#1f2b47',
+  background: '#f5f9ff',
+  surface: '#ffffff',
+  surfaceLight: '#f7faff',
 
   // Border colors
-  border: '#0f3460',
-  borderLight: '#1a3a5c',
+  border: '#dbe6ff',
+  borderLight: '#e7efff',
 
   // Text colors
-  text: '#ffffff',
-  textSecondary: '#888888',
-  textMuted: '#666666',
+  text: '#1b2a4e',
+  textSecondary: '#3e4a6b',
+  textMuted: '#54648c',
 
   // Status colors
-  success: '#4ecdc4',
-  warning: '#ffd93d',
-  error: '#ff6b6b',
-  info: '#6c5ce7',
+  success: '#1abc9c',
+  warning: '#f39c12',
+  error: '#e74c3c',
+  info: '#0dcaf0',
 
   // Accent colors
-  accent1: '#ff6b6b',
-  accent2: '#4ecdc4',
-  accent3: '#ffd93d',
+  accent1: '#0dcaf0',
+  accent2: '#1abc9c',
+  accent3: '#f39c12',
+  
+  // Badge/Pill colors
+  badgeBg: 'rgba(10, 88, 202, 0.12)',
+  pillBg: '#f0f7ff',
 };
 
 // Typography
@@ -64,37 +69,37 @@ export const spacing = {
   '4xl': 48,
 };
 
-// Border radius
+// Border radius (matching web --radius: 16px)
 export const borderRadius = {
   sm: 4,
-  md: 8,
+  md: 10,
   lg: 12,
   xl: 16,
-  '2xl': 24,
+  '2xl': 18,
   full: 9999,
 };
 
-// Shadows (for web)
+// Shadows (matching web shadow-light and shadow-heavy)
 export const shadows = {
   sm: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
+    shadowColor: '#0a58ca',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
     elevation: 2,
   },
   md: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
+    shadowColor: '#0a58ca',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
     elevation: 4,
   },
   lg: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
+    shadowColor: '#1b2a4e',
+    shadowOffset: { width: 0, height: 14 },
+    shadowOpacity: 0.18,
+    shadowRadius: 30,
     elevation: 8,
   },
 };

@@ -11,18 +11,18 @@ export default function HomeScreen() {
   const features = [
     {
       icon: 'flask',
-      title: 'Interactive Simulations',
-      description: 'Experience physics concepts through hands-on virtual experiments',
+      title: 'Simulasi Interaktif',
+      description: 'Pelajari konsep fisika melalui eksperimen virtual yang interaktif',
     },
     {
       icon: 'analytics',
-      title: 'Real-time Data',
-      description: 'Visualize graphs and measurements as you experiment',
+      title: 'Data Real-time',
+      description: 'Visualisasi grafik dan pengukuran saat bereksperimen',
     },
     {
       icon: 'school',
-      title: 'Learn by Doing',
-      description: 'Understand complex concepts through practical application',
+      title: 'Belajar Sambil Praktik',
+      description: 'Pahami konsep kompleks melalui aplikasi praktis',
     },
   ];
 
@@ -32,33 +32,33 @@ export default function HomeScreen() {
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.welcome}>
-            Welcome{user?.user_metadata?.full_name ? `, ${user.user_metadata.full_name}` : ''}!
+            Selamat Datang{user?.user_metadata?.full_name ? `, ${user.user_metadata.full_name}` : ''}!
           </Text>
-          <Text style={styles.title}>Virtual Lab</Text>
-          <Text style={styles.subtitle}>Physics Simulations</Text>
+          <Text style={styles.title}>SimuLab</Text>
+          <Text style={styles.subtitle}>Simulasi Fisika</Text>
         </View>
 
         {/* Hero Section */}
         <View style={styles.heroSection}>
           <Text style={styles.heroText}>
-            Explore the world of physics through interactive simulations
+            Jelajahi dunia fisika melalui simulasi interaktif
           </Text>
           <TouchableOpacity
             style={styles.ctaButton}
             onPress={() => router.push('/(tabs)/simulations')}
           >
-            <Text style={styles.ctaButtonText}>Start Experimenting</Text>
-            <Ionicons name="arrow-forward" size={20} color="#1a1a2e" />
+            <Text style={styles.ctaButtonText}>Mulai Eksperimen</Text>
+            <Ionicons name="arrow-forward" size={20} color="#ffffff" />
           </TouchableOpacity>
         </View>
 
         {/* Features */}
         <View style={styles.featuresSection}>
-          <Text style={styles.sectionTitle}>Why Virtual Lab?</Text>
+          <Text style={styles.sectionTitle}>Mengapa SimuLab?</Text>
           {features.map((feature, index) => (
             <View key={index} style={styles.featureCard}>
               <View style={styles.featureIcon}>
-                <Ionicons name={feature.icon as any} size={28} color="#00d4ff" />
+                <Ionicons name={feature.icon as any} size={28} color="#0a58ca" />
               </View>
               <View style={styles.featureContent}>
                 <Text style={styles.featureTitle}>{feature.title}</Text>
@@ -70,28 +70,28 @@ export default function HomeScreen() {
 
         {/* Quick Access */}
         <View style={styles.quickAccess}>
-          <Text style={styles.sectionTitle}>Quick Access</Text>
+          <Text style={styles.sectionTitle}>Akses Cepat</Text>
           <View style={styles.quickAccessGrid}>
             <TouchableOpacity
               style={styles.quickAccessCard}
               onPress={() => router.push('/simulation/freefall')}
             >
-              <Ionicons name="arrow-down-circle" size={32} color="#00d4ff" />
-              <Text style={styles.quickAccessText}>Free Fall</Text>
+              <Ionicons name="arrow-down-circle" size={32} color="#0a58ca" />
+              <Text style={styles.quickAccessText}>Jatuh Bebas</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.quickAccessCard}
               onPress={() => router.push('/simulation/pendulum')}
             >
-              <Ionicons name="sync-circle" size={32} color="#00d4ff" />
-              <Text style={styles.quickAccessText}>Pendulum</Text>
+              <Ionicons name="sync-circle" size={32} color="#0a58ca" />
+              <Text style={styles.quickAccessText}>Bandul</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.quickAccessCard}
               onPress={() => router.push('/simulation/projectile')}
             >
-              <Ionicons name="trending-up" size={32} color="#00d4ff" />
-              <Text style={styles.quickAccessText}>Projectile</Text>
+              <Ionicons name="trending-up" size={32} color="#0a58ca" />
+              <Text style={styles.quickAccessText}>Gerak Parabola</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -103,7 +103,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#f5f9ff',
   },
   scrollContent: {
     padding: 20,
@@ -114,48 +114,56 @@ const styles = StyleSheet.create({
   },
   welcome: {
     fontSize: 16,
-    color: '#888',
+    color: '#54648c',
     marginBottom: 8,
   },
   title: {
     fontSize: 36,
     fontWeight: 'bold',
-    color: '#00d4ff',
+    color: '#0a58ca',
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 18,
-    color: '#666',
+    color: '#3e4a6b',
   },
   heroSection: {
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderRadius: 16,
     padding: 24,
     alignItems: 'center',
     marginBottom: 32,
-    borderWidth: 1,
-    borderColor: '#0f3460',
+    shadowColor: '#0a58ca',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
   },
   heroText: {
     fontSize: 18,
-    color: '#fff',
+    color: '#1b2a4e',
     textAlign: 'center',
     marginBottom: 20,
     lineHeight: 26,
   },
   ctaButton: {
-    backgroundColor: '#00d4ff',
+    backgroundColor: '#0a58ca',
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 14,
     paddingHorizontal: 24,
     borderRadius: 12,
     gap: 8,
+    shadowColor: '#0a58ca',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 3,
   },
   ctaButtonText: {
-    color: '#1a1a2e',
+    color: '#ffffff',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '600',
   },
   featuresSection: {
     marginBottom: 32,
@@ -163,23 +171,26 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#0a58ca',
     marginBottom: 16,
   },
   featureCard: {
     flexDirection: 'row',
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
-    borderWidth: 1,
-    borderColor: '#0f3460',
+    shadowColor: '#0a58ca',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 3,
   },
   featureIcon: {
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: 'rgba(0, 212, 255, 0.1)',
+    backgroundColor: 'rgba(10, 88, 202, 0.12)',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
@@ -190,12 +201,12 @@ const styles = StyleSheet.create({
   featureTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#fff',
+    color: '#0a58ca',
     marginBottom: 4,
   },
   featureDescription: {
     fontSize: 14,
-    color: '#888',
+    color: '#3e4a6b',
     lineHeight: 20,
   },
   quickAccess: {
@@ -208,15 +219,18 @@ const styles = StyleSheet.create({
   },
   quickAccessCard: {
     flex: 1,
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderRadius: 12,
     padding: 20,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#0f3460',
+    shadowColor: '#0a58ca',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 3,
   },
   quickAccessText: {
-    color: '#fff',
+    color: '#0a58ca',
     fontSize: 12,
     fontWeight: '600',
     marginTop: 8,

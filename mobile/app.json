@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "Virtual Lab",
-    "slug": "virtual-lab",
+    "name": "SimuLab",
+    "slug": "simulab",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "virtuallab",
+    "scheme": "simulab",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
@@ -15,14 +15,14 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.virtuallab.app"
+      "bundleIdentifier": "com.simulab.app"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#1a1a2e"
       },
-      "package": "com.virtuallab.app"
+      "package": "com.simulab.app"
     },
     "web": {
       "bundler": "metro",

@@ -1,4 +1,5 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Modal, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,15 +8,26 @@ import { useAuth } from '@/contexts/AuthContext';
 export default function ProfileScreen() {
   const { user, signOut } = useAuth();
   const router = useRouter();
+  
+  // Modal states
+  const [editProfileVisible, setEditProfileVisible] = useState(false);
+  const [progressVisible, setProgressVisible] = useState(false);
+  const [achievementsVisible, setAchievementsVisible] = useState(false);
+  const [settingsVisible, setSettingsVisible] = useState(false);
+  const [helpVisible, setHelpVisible] = useState(false);
+  const [aboutVisible, setAboutVisible] = useState(false);
+  
+  // Edit profile state
+  const [fullName, setFullName] = useState(user?.user_metadata?.full_name || '');
 
   const handleSignOut = async () => {
     Alert.alert(
-      'Sign Out',
-      'Are you sure you want to sign out?',
+      'Keluar',
+      'Apakah Anda yakin ingin keluar?',
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: 'Batal', style: 'cancel' },
         {
-          text: 'Sign Out',
+          text: 'Keluar',
           style: 'destructive',
           onPress: async () => {
             await signOut();
@@ -26,13 +38,40 @@ export default function ProfileScreen() {
     );
   };
 
+  const handleSaveProfile = () => {
+    Alert.alert('Berhasil', 'Profil berhasil diperbarui!');
+    setEditProfileVisible(false);
+  };
+
   const menuItems = [
-    { icon: 'person-outline', title: 'Edit Profile', onPress: () => {} },
-    { icon: 'bar-chart-outline', title: 'My Progress', onPress: () => {} },
-    { icon: 'trophy-outline', title: 'Achievements', onPress: () => {} },
-    { icon: 'settings-outline', title: 'Settings', onPress: () => {} },
-    { icon: 'help-circle-outline', title: 'Help & Support', onPress: () => {} },
-    { icon: 'information-circle-outline', title: 'About', onPress: () => {} },
+    { icon: 'person-outline', title: 'Edit Profil', onPress: () => setEditProfileVisible(true) },
+    { icon: 'bar-chart-outline', title: 'Progres Saya', onPress: () => setProgressVisible(true) },
+    { icon: 'trophy-outline', title: 'Pencapaian', onPress: () => setAchievementsVisible(true) },
+    { icon: 'settings-outline', title: 'Pengaturan', onPress: () => setSettingsVisible(true) },
+    { icon: 'help-circle-outline', title: 'Bantuan', onPress: () => setHelpVisible(true) },
+    { icon: 'information-circle-outline', title: 'Tentang', onPress: () => setAboutVisible(true) },
+  ];
+
+  // Progress data
+  const progressData = [
+    { name: 'Jatuh Bebas', completed: 3, total: 5 },
+    { name: 'Bandul', completed: 2, total: 5 },
+    { name: 'Gerak Parabola', completed: 1, total: 5 },
+  ];
+
+  // Achievements data
+  const achievements = [
+    { icon: 'rocket', title: 'Pemula', description: 'Selesaikan simulasi pertama', unlocked: true },
+    { icon: 'flask', title: 'Eksperimenter', description: 'Selesaikan 5 eksperimen', unlocked: false },
+    { icon: 'trophy', title: 'Ahli Fisika', description: 'Selesaikan semua simulasi', unlocked: false },
+    { icon: 'star', title: 'Bintang', description: 'Dapatkan skor 100% di kuis', unlocked: false },
+  ];
+
+  // FAQ data
+  const faqItems = [
+    { q: 'Bagaimana cara memulai simulasi?', a: 'Pilih simulasi dari menu Simulasi, lalu atur parameter dan tekan tombol Mulai.' },
+    { q: 'Apakah data saya tersimpan?', a: 'Ya, semua progres dan hasil eksperimen Anda tersimpan secara otomatis di cloud.' },
+    { q: 'Bagaimana cara menghubungi dukungan?', a: 'Kirim email ke support@simulab.id untuk bantuan lebih lanjut.' },
   ];
 
   return (
@@ -41,10 +80,10 @@ export default function ProfileScreen() {
         {/* Profile Header */}
         <View style={styles.profileHeader}>
           <View style={styles.avatarContainer}>
-            <Ionicons name="person" size={50} color="#00d4ff" />
+            <Ionicons name="person" size={50} color="#0a58ca" />
           </View>
           <Text style={styles.userName}>
-            {user?.user_metadata?.full_name || 'User'}
+            {user?.user_metadata?.full_name || 'Pengguna'}
           </Text>
           <Text style={styles.userEmail}>{user?.email}</Text>
         </View>
@@ -53,17 +92,17 @@ export default function ProfileScreen() {
         <View style={styles.statsContainer}>
           <View style={styles.statItem}>
             <Text style={styles.statValue}>0</Text>
-            <Text style={styles.statLabel}>Experiments</Text>
+            <Text style={styles.statLabel}>Eksperimen</Text>
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statItem}>
             <Text style={styles.statValue}>0</Text>
-            <Text style={styles.statLabel}>Quizzes</Text>
+            <Text style={styles.statLabel}>Kuis</Text>
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statItem}>
             <Text style={styles.statValue}>0%</Text>
-            <Text style={styles.statLabel}>Progress</Text>
+            <Text style={styles.statLabel}>Progres</Text>
           </View>
         </View>
 
@@ -75,19 +114,262 @@ export default function ProfileScreen() {
               style={styles.menuItem}
               onPress={item.onPress}
             >
-              <Ionicons name={item.icon as any} size={24} color="#888" />
+              <Ionicons name={item.icon as any} size={24} color="#3e4a6b" />
               <Text style={styles.menuItemText}>{item.title}</Text>
-              <Ionicons name="chevron-forward" size={20} color="#666" />
+              <Ionicons name="chevron-forward" size={20} color="#3e4a6b" />
             </TouchableOpacity>
           ))}
         </View>
 
         {/* Sign Out Button */}
         <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
-          <Ionicons name="log-out-outline" size={24} color="#ff6b6b" />
-          <Text style={styles.signOutText}>Sign Out</Text>
+          <Ionicons name="log-out-outline" size={24} color="#e74c3c" />
+          <Text style={styles.signOutText}>Keluar</Text>
         </TouchableOpacity>
       </ScrollView>
+
+      {/* Edit Profile Modal */}
+      <Modal visible={editProfileVisible} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Edit Profil</Text>
+              <TouchableOpacity onPress={() => setEditProfileVisible(false)}>
+                <Ionicons name="close" size={24} color="#3e4a6b" />
+              </TouchableOpacity>
+            </View>
+            
+            <View style={styles.modalBody}>
+              <Text style={styles.inputLabel}>Nama Lengkap</Text>
+              <TextInput
+                style={styles.modalInput}
+                value={fullName}
+                onChangeText={setFullName}
+                placeholder="Masukkan nama lengkap"
+                placeholderTextColor="#3e4a6b"
+              />
+              
+              <Text style={styles.inputLabel}>Email</Text>
+              <TextInput
+                style={[styles.modalInput, styles.inputDisabled]}
+                value={user?.email || ''}
+                editable={false}
+              />
+              <Text style={styles.hintText}>Email tidak dapat diubah</Text>
+            </View>
+            
+            <TouchableOpacity style={styles.modalButton} onPress={handleSaveProfile}>
+              <Text style={styles.modalButtonText}>Simpan Perubahan</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Progress Modal */}
+      <Modal visible={progressVisible} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Progres Saya</Text>
+              <TouchableOpacity onPress={() => setProgressVisible(false)}>
+                <Ionicons name="close" size={24} color="#3e4a6b" />
+              </TouchableOpacity>
+            </View>
+            
+            <View style={styles.modalBody}>
+              {progressData.map((item, index) => (
+                <View key={index} style={styles.progressItem}>
+                  <View style={styles.progressHeader}>
+                    <Text style={styles.progressName}>{item.name}</Text>
+                    <Text style={styles.progressCount}>{item.completed}/{item.total}</Text>
+                  </View>
+                  <View style={styles.progressBarBg}>
+                    <View 
+                      style={[
+                        styles.progressBarFill, 
+                        { width: `${(item.completed / item.total) * 100}%` }
+                      ]} 
+                    />
+                  </View>
+                </View>
+              ))}
+              
+              <View style={styles.totalProgress}>
+                <Text style={styles.totalProgressLabel}>Total Progres</Text>
+                <Text style={styles.totalProgressValue}>40%</Text>
+              </View>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Achievements Modal */}
+      <Modal visible={achievementsVisible} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Pencapaian</Text>
+              <TouchableOpacity onPress={() => setAchievementsVisible(false)}>
+                <Ionicons name="close" size={24} color="#3e4a6b" />
+              </TouchableOpacity>
+            </View>
+            
+            <ScrollView style={styles.modalBody}>
+              {achievements.map((item, index) => (
+                <View 
+                  key={index} 
+                  style={[
+                    styles.achievementItem,
+                    !item.unlocked && styles.achievementLocked
+                  ]}
+                >
+                  <View style={[
+                    styles.achievementIcon,
+                    item.unlocked ? styles.achievementIconUnlocked : styles.achievementIconLocked
+                  ]}>
+                    <Ionicons 
+                      name={item.icon as any} 
+                      size={24} 
+                      color={item.unlocked ? '#ffffff' : '#3e4a6b'} 
+                    />
+                  </View>
+                  <View style={styles.achievementInfo}>
+                    <Text style={styles.achievementTitle}>{item.title}</Text>
+                    <Text style={styles.achievementDesc}>{item.description}</Text>
+                  </View>
+                  {item.unlocked && (
+                    <Ionicons name="checkmark-circle" size={24} color="#1abc9c" />
+                  )}
+                </View>
+              ))}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Settings Modal */}
+      <Modal visible={settingsVisible} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Pengaturan</Text>
+              <TouchableOpacity onPress={() => setSettingsVisible(false)}>
+                <Ionicons name="close" size={24} color="#3e4a6b" />
+              </TouchableOpacity>
+            </View>
+            
+            <View style={styles.modalBody}>
+              <TouchableOpacity style={styles.settingItem}>
+                <Ionicons name="notifications-outline" size={24} color="#3e4a6b" />
+                <Text style={styles.settingText}>Notifikasi</Text>
+                <View style={styles.settingToggle}>
+                  <View style={styles.toggleOn} />
+                </View>
+              </TouchableOpacity>
+              
+              <TouchableOpacity style={styles.settingItem}>
+                <Ionicons name="moon-outline" size={24} color="#3e4a6b" />
+                <Text style={styles.settingText}>Mode Gelap</Text>
+                <View style={styles.settingToggle}>
+                  <View style={styles.toggleOff} />
+                </View>
+              </TouchableOpacity>
+              
+              <TouchableOpacity style={styles.settingItem}>
+                <Ionicons name="language-outline" size={24} color="#3e4a6b" />
+                <Text style={styles.settingText}>Bahasa</Text>
+                <Text style={styles.settingValue}>Indonesia</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={styles.settingItem}
+                onPress={() => Alert.alert('Cache Dihapus', 'Cache aplikasi berhasil dihapus.')}
+              >
+                <Ionicons name="trash-outline" size={24} color="#3e4a6b" />
+                <Text style={styles.settingText}>Hapus Cache</Text>
+                <Ionicons name="chevron-forward" size={20} color="#3e4a6b" />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Help Modal */}
+      <Modal visible={helpVisible} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Bantuan</Text>
+              <TouchableOpacity onPress={() => setHelpVisible(false)}>
+                <Ionicons name="close" size={24} color="#3e4a6b" />
+              </TouchableOpacity>
+            </View>
+            
+            <ScrollView style={styles.modalBody}>
+              <Text style={styles.faqTitle}>Pertanyaan Umum (FAQ)</Text>
+              {faqItems.map((item, index) => (
+                <View key={index} style={styles.faqItem}>
+                  <Text style={styles.faqQuestion}>{item.q}</Text>
+                  <Text style={styles.faqAnswer}>{item.a}</Text>
+                </View>
+              ))}
+              
+              <View style={styles.contactSection}>
+                <Text style={styles.contactTitle}>Hubungi Kami</Text>
+                <TouchableOpacity style={styles.contactItem}>
+                  <Ionicons name="mail-outline" size={20} color="#0a58ca" />
+                  <Text style={styles.contactText}>support@simulab.id</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.contactItem}>
+                  <Ionicons name="logo-whatsapp" size={20} color="#1abc9c" />
+                  <Text style={styles.contactText}>+62 812-3456-7890</Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* About Modal */}
+      <Modal visible={aboutVisible} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Tentang</Text>
+              <TouchableOpacity onPress={() => setAboutVisible(false)}>
+                <Ionicons name="close" size={24} color="#3e4a6b" />
+              </TouchableOpacity>
+            </View>
+            
+            <View style={styles.modalBody}>
+              <View style={styles.aboutLogo}>
+                <Ionicons name="flask" size={60} color="#0a58ca" />
+                <Text style={styles.aboutAppName}>SimuLab</Text>
+                <Text style={styles.aboutVersion}>Versi 1.0.0</Text>
+              </View>
+              
+              <Text style={styles.aboutDescription}>
+                SimuLab adalah aplikasi simulasi fisika interaktif yang dirancang untuk membantu 
+                siswa dan mahasiswa memahami konsep-konsep fisika melalui eksperimen virtual.
+              </Text>
+              
+              <View style={styles.aboutInfo}>
+                <Text style={styles.aboutInfoItem}>© 2025 SimuLab</Text>
+                <Text style={styles.aboutInfoItem}>Dibuat dengan ❤️ di Indonesia</Text>
+              </View>
+              
+              <View style={styles.aboutLinks}>
+                <TouchableOpacity style={styles.aboutLink}>
+                  <Text style={styles.aboutLinkText}>Kebijakan Privasi</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.aboutLink}>
+                  <Text style={styles.aboutLinkText}>Syarat & Ketentuan</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -95,7 +377,7 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#f5f9ff',
   },
   scrollContent: {
     padding: 20,
@@ -108,31 +390,41 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
     borderWidth: 3,
-    borderColor: '#0f3460',
+    borderColor: '#dbe6ff',
+    shadowColor: '#0a58ca',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
   },
   userName: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#1b2a4e',
     marginBottom: 4,
   },
   userEmail: {
     fontSize: 14,
-    color: '#888',
+    color: '#3e4a6b',
   },
   statsContainer: {
     flexDirection: 'row',
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderRadius: 16,
     padding: 20,
     marginBottom: 24,
     borderWidth: 1,
-    borderColor: '#0f3460',
+    borderColor: '#dbe6ff',
+    shadowColor: '#0a58ca',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
   },
   statItem: {
     flex: 1,
@@ -141,50 +433,340 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#00d4ff',
+    color: '#0a58ca',
     marginBottom: 4,
   },
   statLabel: {
     fontSize: 12,
-    color: '#888',
+    color: '#3e4a6b',
   },
   statDivider: {
     width: 1,
-    backgroundColor: '#0f3460',
+    backgroundColor: '#dbe6ff',
   },
   menuContainer: {
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderRadius: 16,
     overflow: 'hidden',
     marginBottom: 24,
     borderWidth: 1,
-    borderColor: '#0f3460',
+    borderColor: '#dbe6ff',
+    shadowColor: '#0a58ca',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
   },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#0f3460',
+    borderBottomColor: '#dbe6ff',
   },
   menuItemText: {
     flex: 1,
     fontSize: 16,
-    color: '#fff',
+    color: '#1b2a4e',
     marginLeft: 16,
   },
   signOutButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255, 107, 107, 0.1)',
+    backgroundColor: 'rgba(231, 76, 60, 0.1)',
     borderRadius: 12,
     padding: 16,
     gap: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(231, 76, 60, 0.2)',
   },
   signOutText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#ff6b6b',
+    color: '#e74c3c',
+  },
+  // Modal styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: '#ffffff',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    maxHeight: '80%',
+    paddingBottom: 34,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#dbe6ff',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1b2a4e',
+  },
+  modalBody: {
+    padding: 20,
+  },
+  modalInput: {
+    backgroundColor: '#f5f9ff',
+    borderRadius: 12,
+    padding: 16,
+    fontSize: 16,
+    color: '#1b2a4e',
+    borderWidth: 1,
+    borderColor: '#dbe6ff',
+    marginBottom: 16,
+  },
+  inputDisabled: {
+    opacity: 0.6,
+  },
+  inputLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#3e4a6b',
+    marginBottom: 8,
+  },
+  hintText: {
+    fontSize: 12,
+    color: '#3e4a6b',
+    marginTop: -12,
+    marginBottom: 16,
+  },
+  modalButton: {
+    backgroundColor: '#0a58ca',
+    borderRadius: 12,
+    padding: 16,
+    marginHorizontal: 20,
+    alignItems: 'center',
+  },
+  modalButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  // Progress styles
+  progressItem: {
+    marginBottom: 20,
+  },
+  progressHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  progressName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1b2a4e',
+  },
+  progressCount: {
+    fontSize: 14,
+    color: '#3e4a6b',
+  },
+  progressBarBg: {
+    height: 8,
+    backgroundColor: '#dbe6ff',
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  progressBarFill: {
+    height: '100%',
+    backgroundColor: '#0a58ca',
+    borderRadius: 4,
+  },
+  totalProgress: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 20,
+    borderTopWidth: 1,
+    borderTopColor: '#dbe6ff',
+    marginTop: 10,
+  },
+  totalProgressLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1b2a4e',
+  },
+  totalProgressValue: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#0a58ca',
+  },
+  // Achievement styles
+  achievementItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: '#f5f9ff',
+    borderRadius: 12,
+    marginBottom: 12,
+  },
+  achievementLocked: {
+    opacity: 0.6,
+  },
+  achievementIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  achievementIconUnlocked: {
+    backgroundColor: '#0a58ca',
+  },
+  achievementIconLocked: {
+    backgroundColor: '#dbe6ff',
+  },
+  achievementInfo: {
+    flex: 1,
+  },
+  achievementTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1b2a4e',
+    marginBottom: 4,
+  },
+  achievementDesc: {
+    fontSize: 13,
+    color: '#3e4a6b',
+  },
+  // Settings styles
+  settingItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#dbe6ff',
+  },
+  settingText: {
+    flex: 1,
+    fontSize: 16,
+    color: '#1b2a4e',
+    marginLeft: 16,
+  },
+  settingValue: {
+    fontSize: 14,
+    color: '#3e4a6b',
+  },
+  settingToggle: {
+    width: 50,
+    height: 30,
+    borderRadius: 15,
+    justifyContent: 'center',
+    paddingHorizontal: 3,
+  },
+  toggleOn: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#0a58ca',
+    alignSelf: 'flex-end',
+  },
+  toggleOff: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#3e4a6b',
+    alignSelf: 'flex-start',
+  },
+  // FAQ/Help styles
+  faqTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1b2a4e',
+    marginBottom: 16,
+  },
+  faqItem: {
+    marginBottom: 20,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#dbe6ff',
+  },
+  faqQuestion: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#1b2a4e',
+    marginBottom: 8,
+  },
+  faqAnswer: {
+    fontSize: 14,
+    color: '#3e4a6b',
+    lineHeight: 20,
+  },
+  contactSection: {
+    marginTop: 20,
+    paddingTop: 20,
+    borderTopWidth: 1,
+    borderTopColor: '#dbe6ff',
+  },
+  contactTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1b2a4e',
+    marginBottom: 16,
+  },
+  contactItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+    gap: 12,
+  },
+  contactText: {
+    fontSize: 14,
+    color: '#0a58ca',
+  },
+  // About styles
+  aboutLogo: {
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  aboutAppName: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#0a58ca',
+    marginTop: 12,
+  },
+  aboutVersion: {
+    fontSize: 14,
+    color: '#3e4a6b',
+    marginTop: 4,
+  },
+  aboutDescription: {
+    fontSize: 14,
+    color: '#3e4a6b',
+    lineHeight: 22,
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  aboutInfo: {
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  aboutInfoItem: {
+    fontSize: 13,
+    color: '#3e4a6b',
+    marginBottom: 4,
+  },
+  aboutLinks: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 24,
+  },
+  aboutLink: {
+    padding: 8,
+  },
+  aboutLinkText: {
+    fontSize: 14,
+    color: '#0a58ca',
+    textDecorationLine: 'underline',
   },
 });

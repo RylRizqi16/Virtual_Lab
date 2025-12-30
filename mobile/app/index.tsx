@@ -19,9 +19,9 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Virtual Lab</Text>
-      <Text style={styles.subtitle}>Physics Simulations</Text>
-      <ActivityIndicator size="large" color="#00d4ff" style={styles.loader} />
+      <Text style={styles.title}>SimuLab</Text>
+      <Text style={styles.subtitle}>Simulasi Fisika</Text>
+      <ActivityIndicator size="large" color="#0a58ca" style={styles.loader} />
     </View>
   );
 }
@@ -31,17 +31,17 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#f5f9ff',
   },
   title: {
     fontSize: 36,
     fontWeight: 'bold',
-    color: '#00d4ff',
+    color: '#0a58ca',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 18,
-    color: '#888',
+    color: '#3e4a6b',
     marginBottom: 32,
   },
   loader: {

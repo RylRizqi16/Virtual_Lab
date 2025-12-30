@@ -37,7 +37,7 @@ export function Button({
       {loading ? (
         <ActivityIndicator
           size="small"
-          color={variant === 'outline' ? '#00d4ff' : '#1a1a2e'}
+          color={variant === 'outline' ? '#0a58ca' : '#ffffff'}
         />
       ) : (
         <Text
@@ -63,20 +63,20 @@ const styles = StyleSheet.create({
   },
   // Variants
   primary: {
-    backgroundColor: '#00d4ff',
+    backgroundColor: '#0a58ca',
   },
   secondary: {
-    backgroundColor: '#16213e',
+    backgroundColor: '#ffffff',
     borderWidth: 1,
-    borderColor: '#0f3460',
+    borderColor: '#dbe6ff',
   },
   outline: {
     backgroundColor: 'transparent',
     borderWidth: 2,
-    borderColor: '#00d4ff',
+    borderColor: '#0a58ca',
   },
   danger: {
-    backgroundColor: '#ff6b6b',
+    backgroundColor: '#e74c3c',
   },
   disabled: {
     opacity: 0.6,
@@ -99,13 +99,13 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   primaryText: {
-    color: '#1a1a2e',
+    color: '#ffffff',
   },
   secondaryText: {
-    color: '#fff',
+    color: '#1b2a4e',
   },
   outlineText: {
-    color: '#00d4ff',
+    color: '#0a58ca',
   },
   dangerText: {
     color: '#fff',
