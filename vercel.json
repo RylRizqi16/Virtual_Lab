@@ -8,6 +8,10 @@
       }
     },
     {
+      "src": "frontend/**",
+      "use": "@vercel/static"
+    },
+    {
       "src": "mobile/package.json",
       "use": "@vercel/static-build",
       "config": {
@@ -21,8 +25,40 @@
       "dest": "/backend/api/index.js"
     },
     {
+      "src": "/mobile/(.*)",
+      "dest": "/mobile/dist/$1"
+    },
+    {
+      "src": "/mobile",
+      "dest": "/mobile/dist/index.html"
+    },
+    {
+      "src": "/pendulum.html",
+      "dest": "/frontend/pendulum.html"
+    },
+    {
+      "src": "/freefall.html",
+      "dest": "/frontend/freefall.html"
+    },
+    {
+      "src": "/projectile.html",
+      "dest": "/frontend/projectile.html"
+    },
+    {
+      "src": "/profile.html",
+      "dest": "/frontend/profile.html"
+    },
+    {
+      "src": "/(.*\\.(?:css|js|png|jpg|jpeg|gif|svg|webp|ico|json|txt|woff|woff2|ttf|mp3|mp4|webm|pdf))$",
+      "dest": "/frontend/$1"
+    },
+    {
+      "src": "/",
+      "dest": "/frontend/index.html"
+    },
+    {
       "src": "/(.*)",
-      "dest": "/mobile/$1"
+      "dest": "/frontend/$1"
     }
   ]
 }
