@@ -84,7 +84,7 @@ const authElements = {
     registerForm: null,
     authButton: null,
     authCtaButton: null,
-    logoutButton: null,
+    logoutButtons: [],
     authStatusMessage: null,
     progressOverviewBody: null,
     progressOverviewList: null,
@@ -232,7 +232,7 @@ function updateAuthUI() {
     const {
         authButton,
         authCtaButton,
-        logoutButton,
+        logoutButtons,
         authStatusMessage,
         syncNowButton,
         userDisplay,
@@ -252,8 +252,8 @@ function updateAuthUI() {
     if (authCtaButton) {
         authCtaButton.textContent = isLoggedIn ? 'Kelola Akun' : 'Masuk / Daftar';
     }
-    if (logoutButton) {
-        logoutButton.classList.toggle('hidden', !isLoggedIn);
+    if (logoutButtons && logoutButtons.length > 0) {
+        logoutButtons.forEach(btn => btn.classList.toggle('hidden', !isLoggedIn));
     }
     if (syncNowButton) {
         syncNowButton.disabled = !isLoggedIn;
@@ -962,7 +962,7 @@ function initAuth() {
     authElements.registerForm = $('#registerForm');
     authElements.authButton = $('#authButton');
     authElements.authCtaButton = $('#authCtaButton');
-    authElements.logoutButton = $('#logoutButton');
+    authElements.logoutButtons = $$('[data-action="logout"], #logoutButton');
     authElements.authStatusMessage = $('#authStatusMessage');
     authElements.progressOverviewBody = $('#progressOverviewBody');
     authElements.progressOverviewList = $('#progressOverviewList');
@@ -998,7 +998,7 @@ function initAuth() {
         }
     }
     if (authElements.authCtaButton) authElements.authCtaButton.addEventListener('click', () => openAuthModal('login'));
-    if (authElements.logoutButton) authElements.logoutButton.addEventListener('click', logoutUser);
+    if (authElements.logoutButtons) authElements.logoutButtons.forEach(btn => btn.addEventListener('click', logoutUser));
     if (authElements.authToggleButton) {
         authElements.authToggleButton.addEventListener('click', () => {
             const nextMode = authElements.authToggleButton.dataset.mode || 'register';
