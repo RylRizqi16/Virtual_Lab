@@ -1,132 +1,165 @@
-# SimuLab
+# SimuLab - Virtual Physics Laboratory
 
-SimuLab adalah laboratorium fisika virtual dengan autentikasi pengguna dan penyimpanan progres eksperimen berbasis database. Proyek dipisahkan menjadi frontend statis dan backend API sehingga mudah di-deploy ke layanan berbeda (misalnya Netlify/GitHub Pages untuk frontend dan Vercel/AWS Lambda untuk backend).
+SimuLab adalah laboratorium fisika virtual interaktif yang memungkinkan pengguna untuk belajar dan bereksperimen dengan konsep-konsep fisika dasar melalui simulasi visual. Proyek ini tersedia dalam dua platform: **Web Application** dan **Mobile Application (React Native/Expo)**.
 
-## Struktur Proyek
+## Tentang Proyek
+
+SimuLab dirancang untuk membantu mahasiswa dan pelajar memahami konsep fisika melalui pendekatan interaktif. Pengguna dapat menjalankan simulasi fisika, mengubah parameter eksperimen secara real-time, dan menguji pemahaman mereka melalui sistem quiz yang terintegrasi.
+
+### Tujuan Utama
+- Menyediakan alat pembelajaran fisika yang interaktif dan visual
+- Memungkinkan eksperimen tanpa risiko dan tanpa keterbatasan alat laboratorium fisik
+- Melacak progres belajar pengguna melalui sistem autentikasi dan penyimpanan cloud
+- Menguji pemahaman konsep melalui quiz yang disesuaikan dengan setiap simulasi
+
+---
+
+## Fitur Utama
+
+### Simulasi Fisika
+| Simulasi | Deskripsi | Parameter yang Dapat Diubah |
+|----------|-----------|----------------------------|
+| **Bandul Sederhana** | Simulasi osilasi bandul dengan perhitungan periode | Panjang tali, sudut awal, gravitasi |
+| **Gerak Jatuh Bebas** | Simulasi benda jatuh bebas dari ketinggian tertentu | Ketinggian awal, gravitasi |
+| **Gerak Parabola** | Simulasi proyektil dengan lintasan parabola | Kecepatan awal, sudut tembak, gravitasi |
+
+### Sistem Autentikasi
+- **Registrasi & Login** dengan email dan password
+- **JWT Token** untuk keamanan sesi
+- **Password Hashing** menggunakan bcrypt
+- **Guest Mode**: Tamu tetap bisa mencoba simulasi tanpa login
+
+### Tracking Progres
+- Penyimpanan otomatis hasil eksperimen ke cloud
+- Riwayat simulasi yang telah dilakukan
+- Statistik quiz per kategori eksperimen
+
+### Sistem Quiz
+- Quiz dinamis yang di-generate berdasarkan parameter acak
+- Pertanyaan disesuaikan dengan setiap jenis simulasi
+- Toleransi jawaban yang realistis berdasarkan perhitungan fisika
+- Tracking statistik: jumlah percobaan, jawaban benar/salah
+
+### Multi-Platform
+- **Web Application**: Dapat diakses melalui browser modern
+- **Mobile Application**: React Native app untuk iOS, Android, dan Web (via Expo)
+
+---
+
+## Struktur Repository
 
 ```
 SimuLab/
-├── frontend/
-│   ├── index.html
-│   ├── pendulum.html
-│   ├── freefall.html
-│   ├── projectile.html
-│   ├── profile.html
-│   ├── style.css
-│   ├── script.js
-│   └── assets/
-├── backend/
-│   ├── package.json
-│   ├── server.js
-│   ├── api/index.js
+├── README.md                 # Dokumentasi utama
+├── vercel.json              # Konfigurasi deployment Vercel
+│
+├── frontend/                # Web Application (Static HTML/CSS/JS)
+│   ├── index.html           # Landing page
+│   ├── pendulum.html        # Halaman simulasi bandul
+│   ├── freefall.html        # Halaman simulasi jatuh bebas
+│   ├── projectile.html      # Halaman simulasi gerak parabola
+│   ├── profile.html         # Halaman profil pengguna
+│   ├── style.css            # Stylesheet utama
+│   ├── script.js            # Logic aplikasi & API calls
+│   └── assets/              # Gambar dan aset statis
+│
+├── backend/                 # API Server (Node.js/Express)
+│   ├── package.json         # Dependencies backend
+│   ├── server.js            # Entry point server lokal
+│   ├── api/
+│   │   └── index.js         # Serverless function entry (Vercel)
 │   ├── controllers/
-│   │   ├── authController.js
-│   │   └── progressController.js
-│   ├── config/
-│   │   ├── database.js
-│   │   └── env.js
-└── README.md
+│   │   ├── authController.js      # Logika autentikasi
+│   │   ├── profileController.js   # Manajemen profil pengguna
+│   │   ├── progressController.js  # Tracking progres simulasi
+│   │   └── quizController.js      # Sistem quiz & validasi jawaban
+│   └── config/
+│       ├── database.js      # Konfigurasi PostgreSQL/Neon
+│       ├── env.js           # Environment variables
+│       └── supabase.js      # Konfigurasi Supabase client
+│
+└── mobile/                  # Mobile Application (React Native/Expo)
+    ├── package.json         # Dependencies mobile
+    ├── app.json             # Konfigurasi Expo
+    ├── tsconfig.json        # TypeScript configuration
+    ├── app/                  # Expo Router pages
+    │   ├── _layout.tsx      # Root layout
+    │   ├── index.tsx        # Entry point / splash
+    │   ├── (auth)/          # Auth screens
+    │   │   ├── login.tsx
+    │   │   └── register.tsx
+    │   ├── (tabs)/          # Tab navigation
+    │   │   ├── home.tsx
+    │   │   ├── simulations.tsx
+    │   │   └── profile.tsx
+    │   └── simulation/      # Simulation screens
+    │       ├── [type].tsx   # Dynamic route
+    │       ├── freefall.tsx
+    │       ├── pendulum.tsx
+    │       └── projectile.tsx
+    ├── components/ui/       # Reusable UI components
+    ├── constants/           # Theme & global styles
+    ├── contexts/            # React Context (Auth)
+    └── lib/                 # Utilities (Supabase, quiz logic)
 ```
 
-## Fitur Baru
+---
 
-- **Autentikasi Pengguna** menggunakan email & kata sandi (JWT + bcrypt).
-- **Penyimpanan Progres Eksperimen** ke database PostgreSQL terkelola (mis. Neon) yang siap produksi.
-- **UI Multi-Halaman**: landing page terpisah dari masing-masing simulasi (Bandul, Jatuh Bebas, Gerak Parabola).
-- **Sinkronisasi Cloud**: hasil eksperimen bandul otomatis dikirim ke backend saat pengukuran selesai.
-- **Single Sign-On Opsional**: login cukup sekali di landing page SimuLab untuk sinkronisasi lintas modul, sementara tamu tetap bisa langsung menjalankan simulasi.
-- **Halaman Profil**: menyajikan data akun, riwayat simulasi, statistik quiz, serta form pembaruan biodata pengguna.
+## Tech Stack
 
-## Menjalankan Secara Lokal
+### Web Application
+| Layer | Teknologi |
+|-------|-----------|
+| Frontend | HTML5, CSS3, Vanilla JavaScript |
+| Backend | Node.js, Express.js |
+| Database | PostgreSQL (Neon/Supabase) |
+| Auth | JWT, bcrypt |
+| Hosting | Vercel (Serverless) |
 
-### 1. Backend
+### Mobile Application
+| Layer | Teknologi |
+|-------|-----------|
+| Framework | React Native + Expo SDK 52 |
+| Router | Expo Router v4 |
+| Language | TypeScript |
+| Backend | Supabase (Auth + Database) |
+| Styling | React Native StyleSheet |
 
-```powershell
-cd backend
-npm install
-npm run dev
-```
+---
 
-Buat file `.env` di `backend/` untuk konfigurasi lokal:
+## Roadmap & Improvement
 
-```
-PORT=3000
-JWT_SECRET=ubah-rahasia-anda
-CLIENT_ORIGIN=http://localhost:5173
-SALT_ROUNDS=10
-DATABASE_URL=postgres://user:password@host/dbname
-```
+### Fitur yang Dapat Ditambahkan
 
-### 2. Frontend
+#### Simulasi Baru
+- [ ] **Hukum Hooke** - Simulasi pegas dan elastisitas
+- [ ] **Rangkaian Listrik** - Simulasi rangkaian seri/paralel sederhana
+- [ ] **Gelombang** - Visualisasi gelombang transversal dan longitudinal
+- [ ] **Optika Geometri** - Simulasi pembiasan dan pemantulan cahaya
+- [ ] **Termodinamika** - Simulasi ekspansi gas ideal
 
-Frontend bersifat statis. Saat pengembangan lokal, bisa dijalankan dengan server static (contoh `npx serve`) atau langsung melalui ekstensi Live Server di VS Code. Pastikan variabel JavaScript `window.__SIMULAB_API_BASE__` diarahkan ke origin backend bila berbeda host (variabel lama `window.__VLAB_API_BASE__` masih didukung sebagai fallback).
+#### Peningkatan UX/UI
+- [ ] **Dark Mode** - Tema gelap untuk kenyamanan mata
+- [ ] **Animasi yang Lebih Halus** - Menggunakan library animasi seperti Framer Motion
+- [ ] **Onboarding Tutorial** - Panduan interaktif untuk pengguna baru
+- [ ] **Responsive Design** - Optimasi tampilan untuk berbagai ukuran layar
+- [ ] **Accessibility** - Dukungan screen reader dan navigasi keyboard
 
-### Menyiapkan Neon sebagai Database
+#### Fitur Pembelajaran
+- [ ] **Modul Teori** - Penjelasan konsep fisika sebelum simulasi
+- [ ] **Video Tutorial** - Panduan video untuk setiap eksperimen
+- [ ] **Leaderboard** - Papan peringkat untuk quiz
+- [ ] **Achievement System** - Badge dan pencapaian untuk memotivasi pengguna
+- [ ] **Export Data** - Ekspor hasil eksperimen ke PDF/CSV
 
-1. Buat proyek baru di [Neon](https://neon.tech) dan catat connection string Postgres yang disediakan.
-2. Tambahkan connection string tersebut ke file `.env` lokal sebagai `DATABASE_URL`.
-3. Jalankan `npm install` di folder `backend/` untuk menarik dependensi `pg`.
-4. Di Vercel, tambahkan variable lingkungan `DATABASE_URL` dengan nilai connection string yang sama (gunakan opsi `Encrypted`).
-5. Jika ingin memulai dengan tabel kosong, tidak perlu menjalankan migrasi manual—`backend/config/database.js` akan membuat tabel `users` dan `user_progress` secara otomatis.
+#### Teknis
+- [ ] **Unit Testing** - Test coverage untuk backend dan frontend
+- [ ] **E2E Testing** - Automated testing dengan Cypress/Playwright
+- [ ] **CI/CD Pipeline** - Automated deployment dengan GitHub Actions
+- [ ] **API Documentation** - Swagger/OpenAPI untuk dokumentasi endpoint
+- [ ] **Error Monitoring** - Integrasi Sentry untuk tracking error
+- [ ] **Performance Monitoring** - Analytics dan metrics dashboard
+- [ ] **PWA Support** - Progressive Web App untuk offline access
+- [ ] **Real-time Sync** - WebSocket untuk sinkronisasi data real-time
 
-## Deployment ke Vercel + Neon
-
-Konfigurasi repo ini memungkinkan frontend dan backend dirilis dalam satu proyek Vercel, sementara database dijalankan di Neon. Berikut alur lengkapnya.
-
-### 1. Siapkan database di Neon
-
-1. Masuk ke [Neon](https://neon.tech) dan buat project baru.
-2. Salin connection string Postgres (formatnya `postgres://user:password@host/dbname`).
-3. Aktifkan opsi `Require SSL` agar koneksi aman; gunakan connection string SSL-ready jika disediakan.
-4. Opsional: buat role/database terpisah untuk staging dan production agar pengelolaan lebih mudah.
-
-### 2. Impor repository ke Vercel
-
-1. Klik **New Project** di dashboard Vercel, pilih repository GitHub ini.
-2. Biarkan `Framework Preset` kosong (proyek multi-build). Vercel akan membaca `vercel.json` di root.
-3. Gunakan Node.js 18+ (default Vercel saat ini sudah sesuai).
-
-### 3. Atur environment variables
-
-Tambahkan variabel-variabel berikut di tab **Settings → Environment Variables** untuk setiap environment (Production / Preview / Development):
-
-- `DATABASE_URL` → connection string dari Neon.
-- `JWT_SECRET` → rahasia untuk penandatanganan token.
-- `SALT_ROUNDS` → jumlah salt bcrypt (default 10 bila dikosongkan di kode).
-- `CLIENT_ORIGIN` → origin frontend (contoh `https://simulab.vercel.app`).
-
-Vercel akan menanam variabel ini untuk fungsi serverless di `backend/api/index.js`.
-
-### 4. Deploy
-
-1. Jalankan build pertama langsung dari Vercel; `vercel.json` memastikan backend dan frontend ter-deploy bersama.
-2. Setelah deploy, akses domain Vercel Anda. Frontend otomatis tersedia di path root (`/`), sementara endpoint API dapat diakses melalui `/api/*`.
-3. Karena frontend dan backend berada di domain yang sama, `script.js` otomatis menggunakan `/api` tanpa perlu mengatur `window.__SIMULAB_API_BASE__`. Jika suatu saat backend terpisah domain, override variabel tersebut di tag `<script>` sebelum `script.js`.
-
-### Konfigurasi `vercel.json`
-
-`vercel.json` di root repo sudah men-define build dan routing berikut:
-
-```json
-{
-  "builds": [
-    { "src": "backend/api/index.js", "use": "@vercel/node", "config": { "includeFiles": "backend/**" } },
-    { "src": "frontend/**", "use": "@vercel/static" }
-  ],
-  "rewrites": [
-    { "source": "/api/(.*)", "destination": "/backend/api/index.js" }
-  ],
-  "routes": [
-    { "src": "/", "dest": "/frontend/index.html" },
-    { "src": "/(.*)", "dest": "/frontend/$1" }
-  ]
-}
-```
-
-Anda bisa menyesuaikan file ini bila perlu (mis. menambahkan headers untuk cache, route khusus, dsb.).
-
-## Catatan Penting
-
-- Pastikan `DATABASE_URL` mengarah ke instance Postgres yang mendukung SSL (Neon, Supabase, dsb.). Koneksi lokal tanpa SSL juga didukung selama host menggunakan `localhost`.
-- Biasakan mengaktifkan HTTPS/SSL agar token JWT aman saat transmisi.
-- Uji setiap halaman setelah build untuk memastikan pemanggilan API lintas-origin berhasil.
+---
