@@ -25,6 +25,14 @@
       "dest": "/backend/api/index.js"
     },
     {
+      "src": "/mobile$",
+      "dest": "/mobile/dist/index.html"
+    },
+    {
+      "src": "/mobile/$",
+      "dest": "/mobile/dist/index.html"
+    },
+    {
       "src": "/mobile/_expo/(.*)",
       "dest": "/mobile/dist/_expo/$1"
     },
@@ -38,14 +46,6 @@
     },
     {
       "src": "/mobile/(.*)",
-      "dest": "/mobile/dist/index.html"
-    },
-    {
-      "src": "/mobile$",
-      "dest": "/mobile/dist/index.html"
-    },
-    {
-      "src": "/mobile/",
       "dest": "/mobile/dist/index.html"
     },
     {
