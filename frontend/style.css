@@ -429,6 +429,107 @@ th, td { padding: 8px; text-align: center; border-bottom: 1px solid #eef3ff; }
     50% { transform: scale(1.04); }
 }
 
+/* Mobile App Banner */
+.mobile-app-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    background: linear-gradient(135deg, var(--color-primary) 0%, #0847a6 100%);
+    color: white;
+    padding: 12px 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    animation: slideDown 0.4s ease-out;
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.mobile-app-banner.hidden {
+    display: none;
+}
+
+.banner-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    max-width: 1200px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+}
+
+.banner-icon {
+    font-size: 1.4rem;
+}
+
+.banner-text {
+    color: white;
+    font-size: 0.95rem;
+}
+
+.banner-text strong {
+    color: var(--color-accent);
+}
+
+.banner-link {
+    display: inline-flex;
+    align-items: center;
+    background: white;
+    color: var(--color-primary);
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.banner-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255,255,255,0.3);
+}
+
+.banner-close {
+    background: transparent;
+    border: 2px solid rgba(255,255,255,0.5);
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+}
+
+.banner-close:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+/* Adjust body padding when banner is visible */
+body.has-banner {
+    padding-top: 60px;
+}
+
+@media (max-width: 600px) {
+    .banner-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 8px;
+    }
+    .banner-text {
+        font-size: 0.85rem;
+    }
+    body.has-banner {
+        padding-top: 100px;
+    }
+}
+
 @media (max-width: 800px) {
     .lab-container { flex-direction: column; }
     .simulation-area { width: 100%; }
@@ -447,3 +548,4 @@ th, td { padding: 8px; text-align: center; border-bottom: 1px solid #eef3ff; }
     .profile-status { text-align: left; }
     .profile-grid { grid-template-columns: 1fr; }
 }
+

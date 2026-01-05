@@ -8,8 +8,8 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "build": "expo export -p web",
-    "vercel-build": "expo export -p web"
+    "build": "npx expo export -p web --output-dir dist",
+    "vercel-build": "npx expo export -p web --output-dir dist"
   },
   "dependencies": {
     "@expo/vector-icons": "~14.0.4",

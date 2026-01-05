@@ -1948,7 +1948,31 @@ function initProfilePage() {
     }
 }
 
+/* Mobile App Banner */
+function initMobileBanner() {
+    const banner = $('#mobileAppBanner');
+    const closeBtn = $('#closeMobileBanner');
+    
+    if (!banner || !closeBtn) return;
+    
+    // Check if user already dismissed the banner
+    const bannerDismissed = localStorage.getItem('simulab_mobile_banner_dismissed');
+    
+    if (bannerDismissed) {
+        banner.classList.add('hidden');
+    } else {
+        document.body.classList.add('has-banner');
+    }
+    
+    closeBtn.addEventListener('click', () => {
+        banner.classList.add('hidden');
+        document.body.classList.remove('has-banner');
+        localStorage.setItem('simulab_mobile_banner_dismissed', 'true');
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    initMobileBanner();
     initAuth();
     initPendulum();
     initFreeFall();
@@ -1982,3 +2006,4 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 });
+
